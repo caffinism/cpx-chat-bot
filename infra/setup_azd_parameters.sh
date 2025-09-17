@@ -1,18 +1,9 @@
 #!/bin/bash
 
 declare -a regions=(
-    "australiaeast"
-    "centralindia"
+    "japaneast"
     "eastus"
     "eastus2"
-    "koreacentral"
-    "northeurope"
-    "southcentralus"
-    "switzerlandnorth"
-    "uksouth"
-    "westeurope"
-    "westus2"
-    "westus3"
 )
 
 declare -a models=(
