@@ -1,0 +1,17 @@
+{
+    "type": "function",
+    "function": {
+        "name": "get_cqa",
+        "description": "Answers the specified question using a pre-configured knowledge base",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "description": "The question to be answered, e.g. How long does it take for the surface laptop to charge?"
+                }
+            },
+            "required": ["question"]
+        }
+    }
+}

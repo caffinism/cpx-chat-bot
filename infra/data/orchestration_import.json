@@ -1,0 +1,37 @@
+{
+    "projectFileVersion": "2023-04-01",
+    "stringIndexType": "Utf16CodeUnit",
+    "metadata": {
+      "projectKind": "Orchestration",
+      "settings": {},
+      "projectName": "contoso-outdoors-orch",
+      "multilingual": false,
+      "language": "ko",
+      "description": ""
+    },
+    "assets": {
+      "projectKind": "Orchestration",
+      "intents": [
+        {
+          "category": "CLU",
+          "orchestration": {
+                "targetProjectKind": "Conversation",
+                "conversationOrchestration": {
+                    "projectName": "<project-name>",
+                    "deploymentName": "<deployment-name>"
+                }
+          }
+        },
+        {
+          "category": "CQA",
+          "orchestration": {
+                "targetProjectKind": "QuestionAnswering",
+                "questionAnsweringOrchestration": {
+                    "projectName": "<project-name>"
+                }
+          }
+        }
+      ],
+      "utterances": []
+    }
+  }

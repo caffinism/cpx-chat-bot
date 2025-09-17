@@ -1,0 +1,11 @@
+requests
+uvicorn
+fastapi
+openai
+azure-identity
+azure-search-documents
+azure-ai-textanalytics
+azure-ai-language-conversations
+azure-ai-language-questionanswering
+semantic-kernel
+azure-ai-agents

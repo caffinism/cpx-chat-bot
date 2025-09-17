@@ -1,0 +1,17 @@
+{
+    "type": "function",
+    "function": {
+        "name": "get_clu",
+        "description": "Predicts the overall intention of an utterance and extracts relevant entities within it",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "utterance": {
+                    "type": "string",
+                    "description": "The utterance to be analyzed, e.g. play In the air tonight from Phil Collins"
+                }
+            },
+            "required": ["utterance"]
+        }
+    }
+}
