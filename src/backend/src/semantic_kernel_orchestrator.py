@@ -7,9 +7,7 @@ from typing import Callable
 from semantic_kernel.agents import AzureAIAgent, GroupChatOrchestration, GroupChatManager, BooleanResult, StringResult, MessageResult
 from semantic_kernel.contents import ChatMessageContent, ChatHistory, AuthorRole
 from semantic_kernel.agents.runtime import InProcessRuntime
-from agents.order_status_plugin import OrderStatusPlugin
-from agents.order_refund_plugin import OrderRefundPlugin
-from agents.order_cancel_plugin import OrderCancellationPlugin
+# Medical consultation imports - order plugins removed
 from azure.ai.projects import AIProjectClient
 from pydantic import BaseModel
 
@@ -179,7 +177,7 @@ class CustomGroupChatManager(GroupChatManager):
             return route_head_support_message(last_message, participant_descriptions)
 
         # Process custom agent messages - customize as needed
-        elif last_message.name in ["OrderStatusAgent", "OrderRefundAgent", "OrderCancelAgent"]:
+        elif last_message.name in ["MedicalConsultationAgent"]:
             print(f"[SYSTEM]: Last message is from {last_message.name}, translate back to original language if needed.")
             return route_custom_agent_message(last_message, participant_descriptions)
 
@@ -241,10 +239,7 @@ class SemanticKernelOrchestrator:
         self.fallback_function = fallback_function
         self.max_retries = max_retries
 
-        # Initialize plugins for custom agents
-        self.order_status_plugin = OrderStatusPlugin()
-        self.order_refund_plugin = OrderRefundPlugin()
-        self.order_cancel_plugin = OrderCancellationPlugin()
+        # Medical consultation system - no plugins needed for basic medical agent
 
     async def initialize_agents(self) -> list:
         """
@@ -259,28 +254,11 @@ class SemanticKernelOrchestrator:
             description="A triage agent that routes inquiries to the proper custom agent."
         )
 
-        order_status_agent_definition = await self.client.agents.get_agent(self.agent_ids["ORDER_STATUS_AGENT_ID"])
-        order_status_agent = AzureAIAgent(
+        medical_agent_definition = await self.client.agents.get_agent(self.agent_ids["MEDICAL_AGENT_ID"])
+        medical_agent = AzureAIAgent(
             client=self.client,
-            definition=order_status_agent_definition,
-            description="An agent that checks order status",
-            plugins=[OrderStatusPlugin()],
-        )
-
-        order_cancel_agent_definition = await self.client.agents.get_agent(self.agent_ids["ORDER_CANCEL_AGENT_ID"])
-        order_cancel_agent = AzureAIAgent(
-            client=self.client,
-            definition=order_cancel_agent_definition,
-            description="An agent that checks on cancellations",
-            plugins=[OrderCancellationPlugin()],
-        )
-
-        order_refund_agent_definition = await self.client.agents.get_agent(self.agent_ids["ORDER_REFUND_AGENT_ID"])
-        order_refund_agent = AzureAIAgent(
-            client=self.client,
-            definition=order_refund_agent_definition,
-            description="An agent that checks on refunds",
-            plugins=[OrderRefundPlugin()],
+            definition=medical_agent_definition,
+            description="A CPX medical consultation agent that conducts systematic medical interviews"
         )
 
         head_support_agent_definition = await self.client.agents.get_agent(self.agent_ids["HEAD_SUPPORT_AGENT_ID"])
@@ -302,12 +280,10 @@ class SemanticKernelOrchestrator:
         print("Agents initialized successfully.")
         print(f"Triage Agent ID: {triage_agent.id}")
         print(f"Head Support Agent ID: {head_support_agent.id}")
-        print(f"Order Status Agent ID: {order_status_agent.id}")
-        print(f"Order Cancel Agent ID: {order_cancel_agent.id}")
-        print(f"Order Refund Agent ID: {order_refund_agent.id}")
+        print(f"Medical Agent ID: {medical_agent.id}")
         print(f"Translation Agent ID: {translation_agent.id}")
 
-        return [translation_agent, triage_agent, head_support_agent, order_status_agent, order_cancel_agent, order_refund_agent]
+        return [translation_agent, triage_agent, head_support_agent, medical_agent]
 
     async def create_agent_group_chat(self) -> None:
         """

@@ -62,9 +62,8 @@ else:
 required_agents = [
     "TRIAGE_AGENT_ID",
     "HEAD_SUPPORT_AGENT_ID",
-    "ORDER_STATUS_AGENT_ID",
-    "ORDER_CANCEL_AGENT_ID",
-    "ORDER_REFUND_AGENT_ID"
+    "MEDICAL_AGENT_ID",
+    "TRANSLATION_AGENT_ID"
 ]
 
 missing_agents = [agent for agent in required_agents if not AGENT_IDS.get(agent)]
