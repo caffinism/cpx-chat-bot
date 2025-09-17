@@ -61,7 +61,7 @@ param router_type string = 'ORCHESTRATION'
 param app_mode string = 'SEMANTIC_KERNEL'
 param image string = 'mcr.microsoft.com/azure-cli'
 param port int = 8000
-param repository string = 'https://github.com/YOUR-USERNAME/YOUR-REPO-NAME'
+param repository string = 'https://github.com/caffinism/cpx-chat-bot.git'
  
 // Managed Identity:
 @description('Name of managed identity to use for Container Apps.')
