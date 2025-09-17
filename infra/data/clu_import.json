@@ -6,7 +6,7 @@
         "settings": {},
         "projectName": "contoso-outdoors-clu",
         "multilingual": false,
-        "language": "ko",
+        "language": "en-us",
         "description": ""
     },
     "assets": {
@@ -39,25 +39,25 @@
         "utterances": [
             {
                 "text": "place order for water bottle",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "None",
                 "entities": []
             },
             {
                 "text": "submit repair request for my bike",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "None",
                 "entities": []
             },
             {
                 "text": "can my backpack be repaired",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "None",
                 "entities": []
             },
             {
                 "text": "refund order 89765757",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "None",
                 "entities": [
                     {
@@ -69,13 +69,13 @@
             },
             {
                 "text": "please place order for tent",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "None",
                 "entities": []
             },
             {
                 "text": "was i refunded for order 12344444",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "RefundStatus",
                 "entities": [
                     {
@@ -87,7 +87,7 @@
             },
             {
                 "text": "can i refund order 56784567",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "RefundStatus",
                 "entities": [
                     {
@@ -99,7 +99,7 @@
             },
             {
                 "text": "when will i be refunded for order 89089034",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "RefundStatus",
                 "entities": [
                     {
@@ -111,7 +111,7 @@
             },
             {
                 "text": "when will i get my refund for 89898989",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "RefundStatus",
                 "entities": [
                     {
@@ -123,7 +123,7 @@
             },
             {
                 "text": "did my refund for 12312344 go through",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "RefundStatus",
                 "entities": [
                     {
@@ -135,7 +135,7 @@
             },
             {
                 "text": "shipping status 09090909",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "OrderStatus",
                 "entities": [
                     {
@@ -147,7 +147,7 @@
             },
             {
                 "text": "has order 88889999 shipped",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "OrderStatus",
                 "entities": [
                     {
@@ -159,7 +159,7 @@
             },
             {
                 "text": "I placed order 44445555 last week, what is its status",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "OrderStatus",
                 "entities": [
                     {
@@ -171,7 +171,7 @@
             },
             {
                 "text": "did my order 12345555 go through",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "OrderStatus",
                 "entities": [
                     {
@@ -183,7 +183,7 @@
             },
             {
                 "text": "what is the status of 11112222",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "OrderStatus",
                 "entities": [
                     {
@@ -195,7 +195,7 @@
             },
             {
                 "text": "Undo 12334444",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "CancelOrder",
                 "entities": [
                     {
@@ -207,7 +207,7 @@
             },
             {
                 "text": "please stop order 55556666",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "CancelOrder",
                 "entities": [
                     {
@@ -219,7 +219,7 @@
             },
             {
                 "text": "Can you cancel 12345678",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "CancelOrder",
                 "entities": [
                     {
@@ -231,7 +231,7 @@
             },
             {
                 "text": "Cancel 888888",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "CancelOrder",
                 "entities": [
                     {
@@ -243,7 +243,7 @@
             },
             {
                 "text": "Please cancel order 27787724",
-                "language": "ko",
+                "language": "en-us",
                 "intent": "CancelOrder",
                 "entities": [
                     {
