@@ -5,6 +5,7 @@ declare -a regions=(
     "centralindia"
     "eastus"
     "eastus2"
+    "koreacentral"
     "northeurope"
     "southcentralus"
     "switzerlandnorth"

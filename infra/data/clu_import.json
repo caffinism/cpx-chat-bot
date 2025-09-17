@@ -49,13 +49,13 @@
                 "entities": []
             },
             {
-                "text": "good morning",
+                "text": "안녕하세요",
                 "language": "en-us",
                 "intent": "GeneralGreeting",
                 "entities": []
             },
             {
-                "text": "안녕하세요",
+                "text": "안녕하세요 의사 선생님",
                 "language": "en-us",
                 "intent": "GeneralGreeting",
                 "entities": []
@@ -64,143 +64,118 @@
                 "text": "머리가 아파요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "BodyPart",
-                        "offset": 0,
-                        "length": 2
-                    },
-                    {
-                        "category": "Symptom",
-                        "offset": 4,
-                        "length": 3
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "I have a headache",
+                "text": "두통이 심해요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "Symptom",
-                        "offset": 9,
-                        "length": 8
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "my stomach hurts",
+                "text": "배가 아픈데요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "BodyPart",
-                        "offset": 3,
-                        "length": 7
-                    },
-                    {
-                        "category": "Symptom",
-                        "offset": 11,
-                        "length": 5
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "배가 아파요",
+                "text": "복통이 있어요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "BodyPart",
-                        "offset": 0,
-                        "length": 1
-                    },
-                    {
-                        "category": "Symptom",
-                        "offset": 3,
-                        "length": 3
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "I feel dizzy",
+                "text": "가슴이 답답해요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "Symptom",
-                        "offset": 7,
-                        "length": 5
-                    }
-                ]
+                "entities": []
+            },
+            {
+                "text": "숨이 차요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "기침이 나와요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "열이 나요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
             },
             {
                 "text": "어지러워요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "Symptom",
-                        "offset": 0,
-                        "length": 5
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "I have chest pain",
+                "text": "허리가 아파요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "BodyPart",
-                        "offset": 7,
-                        "length": 5
-                    },
-                    {
-                        "category": "Symptom",
-                        "offset": 13,
-                        "length": 4
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "가슴이 아파요",
+                "text": "목이 아픈데요",
                 "language": "en-us",
                 "intent": "SymptomInquiry",
-                "entities": [
-                    {
-                        "category": "BodyPart",
-                        "offset": 0,
-                        "length": 2
-                    },
-                    {
-                        "category": "Symptom",
-                        "offset": 4,
-                        "length": 3
-                    }
-                ]
+                "entities": []
             },
             {
-                "text": "what could this be",
+                "text": "설사를 해요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "변비가 있어요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "잠을 못 자요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "몸이 피곤해요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": []
+            },
+            {
+                "text": "이게 뭐가 문제일까요",
                 "language": "en-us",
                 "intent": "MedicalConsultation",
                 "entities": []
             },
             {
-                "text": "help me understand my symptoms",
+                "text": "증상을 설명해주세요",
                 "language": "en-us",
                 "intent": "MedicalConsultation",
                 "entities": []
             },
             {
-                "text": "무엇이 문제일까요",
+                "text": "어떤 병일까요",
                 "language": "en-us",
                 "intent": "MedicalConsultation",
                 "entities": []
             },
             {
-                "text": "what should I do",
+                "text": "진단을 받고 싶어요",
+                "language": "en-us",
+                "intent": "MedicalConsultation",
+                "entities": []
+            },
+            {
+                "text": "치료 방법을 알려주세요",
                 "language": "en-us",
                 "intent": "MedicalConsultation",
                 "entities": []

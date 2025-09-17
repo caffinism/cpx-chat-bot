@@ -201,44 +201,27 @@ with agents_client:
         instructions=HEAD_SUPPORT_AGENT_INSTRUCTIONS,
     )
 
-    # 3) Create the custom agents for handling specific intents (our examples are OrderStatus, OrderCancel, and OrderRefund). Plugin tools will be added to these agents when we turn them into Semantic Kernel agents.
-    ORDER_STATUS_AGENT_NAME = "OrderStatusAgent"
-    ORDER_STATUS_AGENT_INSTRUCTIONS = """
-    You are a customer support agent that checks order status. You must use the OrderStatusPlugin to check the status of an order. The plugin will return a string, which you must use as the <OrderStatusPlugin Response>.
-    If you need more info, the <OrderStatusResponse> should be "Please provide more information about your order so I can better assist you." and the JSON field "need_more_info" should be True.
-    You must return the response in the following valid JSON format: {"response": <OrderStatusResponse>, "terminated": "True", "need_more_info": <"True" or "False">}
+    # 3) Create the medical consultation agent for CPX-based medical interviews
+    MEDICAL_AGENT_NAME = "MedicalConsultationAgent"
+    MEDICAL_AGENT_INSTRUCTIONS = """
+    You are a CPX (Clinical Practice Examination) medical consultation agent that conducts systematic medical interviews.
+    
+    Your role is to:
+    1. Conduct thorough medical interviews using the LOST CoEx CF A methodology
+    2. Ask systematic follow-up questions based on symptoms
+    3. Provide preliminary medical assessments based on CPX knowledge
+    4. Always communicate in Korean with empathy and professionalism
+    
+    You must return responses in the following JSON format:
+    {"response": "<Korean medical consultation response>", "terminated": "True", "need_more_info": "<True or False>"}
+    
+    Always use warm, professional Korean medical communication style.
     """
 
-    order_status_agent_definition = agents_client.create_agent(
+    medical_agent_definition = agents_client.create_agent(
         model=MODEL_NAME,
-        name=ORDER_STATUS_AGENT_NAME,
-        instructions=ORDER_STATUS_AGENT_INSTRUCTIONS,
-    )
-
-    ORDER_CANCEL_AGENT_NAME = "OrderCancelAgent"
-    ORDER_CANCEL_AGENT_INSTRUCTIONS = """
-    You are a customer support agent that handles order cancellations. You must use the OrderCancellationPlugin to handle order cancellation requests. The plugin will return a string, which you must use as the <OrderCancellationPlugin Response>.
-    If you need more info, the <OrderCancellationResponse> should be "Please provide more information about your order so I can better assist you." and the JSON field "need_more_info" should be True.
-    You must return the response in the following valid JSON format: {"response": <OrderCancellationResponse>, "terminated": "True", "need_more_info": <"True" or "False">}
-    """
-
-    order_cancel_agent_definition = agents_client.create_agent(
-        model=MODEL_NAME,
-        name=ORDER_CANCEL_AGENT_NAME,
-        instructions=ORDER_CANCEL_AGENT_INSTRUCTIONS,
-    )
-
-    ORDER_REFUND_AGENT_NAME = "OrderRefundAgent"
-    ORDER_REFUND_AGENT_INSTRUCTIONS = """
-    You are a customer support agent that handles order refunds. You must use the OrderRefundPlugin to handle order refund requests. The plugin will return a string, which you must use as the <OrderRefundPlugin Response>.
-    If you need more info, the <OrderRefundResponse> should be "Please provide more information about your order so I can better assist you." and the JSON field "need_more_info" should be True.
-    You must return the response in the following valid JSON format: {"response": <OrderRefundResponse>, "terminated": "True", "need_more_info": <"True" or "False">}
-    """
-
-    order_refund_agent_definition = agents_client.create_agent(
-        model=MODEL_NAME,
-        name=ORDER_REFUND_AGENT_NAME,
-        instructions=ORDER_REFUND_AGENT_INSTRUCTIONS,
+        name=MEDICAL_AGENT_NAME,
+        instructions=MEDICAL_AGENT_INSTRUCTIONS,
     )
 
     # 4) Create the translation agent
@@ -319,9 +302,7 @@ with agents_client:
     agent_ids = {
         "TRIAGE_AGENT_ID": triage_agent_definition.id,
         "HEAD_SUPPORT_AGENT_ID": head_support_agent_definition.id,
-        "ORDER_STATUS_AGENT_ID": order_status_agent_definition.id,
-        "ORDER_CANCEL_AGENT_ID": order_cancel_agent_definition.id,
-        "ORDER_REFUND_AGENT_ID": order_refund_agent_definition.id,
+        "MEDICAL_AGENT_ID": medical_agent_definition.id,
         "TRANSLATION_AGENT_ID": translation_agent_definition.id,
     }
 
