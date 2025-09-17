@@ -16,242 +16,194 @@
                 "category": "None"
             },
             {
-                "category": "OrderStatus"
+                "category": "MedicalConsultation"
             },
             {
-                "category": "RefundStatus"
+                "category": "SymptomInquiry"
             },
             {
-                "category": "CancelOrder"
+                "category": "GeneralGreeting"
             }
         ],
         "entities": [
             {
-                "category": "OrderId",
-                "compositionSetting": "combineComponents",
-                "prebuilts": [
-                    {
-                        "category": "Quantity.Number"
-                    }
-                ]
+                "category": "BodyPart",
+                "compositionSetting": "combineComponents"
+            },
+            {
+                "category": "Symptom",
+                "compositionSetting": "combineComponents"
             }
         ],
         "utterances": [
             {
-                "text": "place order for water bottle",
+                "text": "hello",
                 "language": "en-us",
-                "intent": "None",
+                "intent": "GeneralGreeting",
                 "entities": []
             },
             {
-                "text": "submit repair request for my bike",
+                "text": "hi doctor",
                 "language": "en-us",
-                "intent": "None",
+                "intent": "GeneralGreeting",
                 "entities": []
             },
             {
-                "text": "can my backpack be repaired",
+                "text": "good morning",
                 "language": "en-us",
-                "intent": "None",
+                "intent": "GeneralGreeting",
                 "entities": []
             },
             {
-                "text": "refund order 89765757",
+                "text": "안녕하세요",
                 "language": "en-us",
-                "intent": "None",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 13,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "please place order for tent",
-                "language": "en-us",
-                "intent": "None",
+                "intent": "GeneralGreeting",
                 "entities": []
             },
             {
-                "text": "was i refunded for order 12344444",
+                "text": "머리가 아파요",
                 "language": "en-us",
-                "intent": "RefundStatus",
+                "intent": "SymptomInquiry",
                 "entities": [
                     {
-                        "category": "OrderId",
-                        "offset": 25,
+                        "category": "BodyPart",
+                        "offset": 0,
+                        "length": 2
+                    },
+                    {
+                        "category": "Symptom",
+                        "offset": 4,
+                        "length": 3
+                    }
+                ]
+            },
+            {
+                "text": "I have a headache",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": [
+                    {
+                        "category": "Symptom",
+                        "offset": 9,
                         "length": 8
                     }
                 ]
             },
             {
-                "text": "can i refund order 56784567",
+                "text": "my stomach hurts",
                 "language": "en-us",
-                "intent": "RefundStatus",
+                "intent": "SymptomInquiry",
                 "entities": [
                     {
-                        "category": "OrderId",
-                        "offset": 19,
-                        "length": 8
+                        "category": "BodyPart",
+                        "offset": 3,
+                        "length": 7
+                    },
+                    {
+                        "category": "Symptom",
+                        "offset": 11,
+                        "length": 5
                     }
                 ]
             },
             {
-                "text": "when will i be refunded for order 89089034",
+                "text": "배가 아파요",
                 "language": "en-us",
-                "intent": "RefundStatus",
+                "intent": "SymptomInquiry",
                 "entities": [
                     {
-                        "category": "OrderId",
-                        "offset": 34,
-                        "length": 8
+                        "category": "BodyPart",
+                        "offset": 0,
+                        "length": 1
+                    },
+                    {
+                        "category": "Symptom",
+                        "offset": 3,
+                        "length": 3
                     }
                 ]
             },
             {
-                "text": "when will i get my refund for 89898989",
+                "text": "I feel dizzy",
                 "language": "en-us",
-                "intent": "RefundStatus",
+                "intent": "SymptomInquiry",
                 "entities": [
                     {
-                        "category": "OrderId",
-                        "offset": 30,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "did my refund for 12312344 go through",
-                "language": "en-us",
-                "intent": "RefundStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 18,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "shipping status 09090909",
-                "language": "en-us",
-                "intent": "OrderStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 16,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "has order 88889999 shipped",
-                "language": "en-us",
-                "intent": "OrderStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 10,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "I placed order 44445555 last week, what is its status",
-                "language": "en-us",
-                "intent": "OrderStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 15,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "did my order 12345555 go through",
-                "language": "en-us",
-                "intent": "OrderStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 13,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "what is the status of 11112222",
-                "language": "en-us",
-                "intent": "OrderStatus",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 22,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "Undo 12334444",
-                "language": "en-us",
-                "intent": "CancelOrder",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 5,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "please stop order 55556666",
-                "language": "en-us",
-                "intent": "CancelOrder",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 18,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "Can you cancel 12345678",
-                "language": "en-us",
-                "intent": "CancelOrder",
-                "entities": [
-                    {
-                        "category": "OrderId",
-                        "offset": 15,
-                        "length": 8
-                    }
-                ]
-            },
-            {
-                "text": "Cancel 888888",
-                "language": "en-us",
-                "intent": "CancelOrder",
-                "entities": [
-                    {
-                        "category": "OrderId",
+                        "category": "Symptom",
                         "offset": 7,
-                        "length": 6
+                        "length": 5
                     }
                 ]
             },
             {
-                "text": "Please cancel order 27787724",
+                "text": "어지러워요",
                 "language": "en-us",
-                "intent": "CancelOrder",
+                "intent": "SymptomInquiry",
                 "entities": [
                     {
-                        "category": "OrderId",
-                        "offset": 20,
-                        "length": 8
+                        "category": "Symptom",
+                        "offset": 0,
+                        "length": 5
                     }
                 ]
+            },
+            {
+                "text": "I have chest pain",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": [
+                    {
+                        "category": "BodyPart",
+                        "offset": 7,
+                        "length": 5
+                    },
+                    {
+                        "category": "Symptom",
+                        "offset": 13,
+                        "length": 4
+                    }
+                ]
+            },
+            {
+                "text": "가슴이 아파요",
+                "language": "en-us",
+                "intent": "SymptomInquiry",
+                "entities": [
+                    {
+                        "category": "BodyPart",
+                        "offset": 0,
+                        "length": 2
+                    },
+                    {
+                        "category": "Symptom",
+                        "offset": 4,
+                        "length": 3
+                    }
+                ]
+            },
+            {
+                "text": "what could this be",
+                "language": "en-us",
+                "intent": "MedicalConsultation",
+                "entities": []
+            },
+            {
+                "text": "help me understand my symptoms",
+                "language": "en-us",
+                "intent": "MedicalConsultation",
+                "entities": []
+            },
+            {
+                "text": "무엇이 문제일까요",
+                "language": "en-us",
+                "intent": "MedicalConsultation",
+                "entities": []
+            },
+            {
+                "text": "what should I do",
+                "language": "en-us",
+                "intent": "MedicalConsultation",
+                "entities": []
             }
         ]
     }

@@ -180,16 +180,17 @@ with agents_client:
     # 2) Create the head support agent which takes in CLU intents and entities and routes the request to the appropriate support agent
     HEAD_SUPPORT_AGENT_NAME = "HeadSupportAgent"
     HEAD_SUPPORT_AGENT_INSTRUCTIONS = """
-     You are a head support agent that routes inquiries to the proper custom agent based on the provided intent and entities from the triage agent.
-        You must choose between the following agents:
-        - OrderStatusAgent: for order status inquiries
-        - OrderCancelAgent: for order cancellation inquiries
-        - OrderRefundAgent: for order refund inquiries
+     You are a head support agent that routes medical inquiries to the appropriate response system.
+        Based on the provided intent and entities from the triage agent:
+        
+        - For medical-related intents (MedicalConsultation, SymptomInquiry): Route to fallback_function (RAG system)
+        - For general greetings (GeneralGreeting): Route to fallback_function for warm medical greeting
+        - For any other intents: Route to fallback_function for medical assistance
 
-        You must return the response in the following valid JSON format: {"target_agent": "<AgentName>","intent": "<IntentName>","entities": [<List of extracted entities>],"terminated": "False"}
+        You must return the response in the following valid JSON format: {"target_agent": "fallback_function","intent": "<IntentName>","entities": [<List of extracted entities>],"terminated": "False"}
 
         Where:
-        - "target_agent" is the name of the agent you are routing to (must match one of the agent names above).
+        - "target_agent" should always be "fallback_function" to use the RAG-based medical consultation system
         - "intent" is the top-level intent extracted from the CLU result.
         - "entities" is a list of all entities extracted from the CLU result, including their category and value.
     """
