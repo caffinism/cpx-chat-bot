@@ -111,10 +111,11 @@ print(f"PII_ENABLED: {PII_ENABLED}")
 def fallback_function(
     query: str,
     language: str,
-    id: int
+    id: int,
+    history: list[ChatMessage] = None
 ) -> str:
     """
-    Call RAG client for grounded chat completion.
+    Call RAG client for grounded chat completion with conversation history.
     """
     if PII_ENABLED:
         # Redact PII:
@@ -125,7 +126,7 @@ def fallback_function(
             cache=True
         )
 
-    return rag_client.chat_completion(query)
+    return rag_client.chat_completion(query, history=history)
 
 
 # Function to handle processing and orchestrating a chat message with utterance extraction, fallback handling, and PII redaction
@@ -168,7 +169,8 @@ async def orchestrate_chat(
                 response = fallback_function(
                     message,
                     "en",  # Assuming English for simplicity, adjust as needed
-                    chat_id
+                    chat_id,
+                    history
                 )
             responses.append(response)
 

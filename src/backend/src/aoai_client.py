@@ -166,28 +166,44 @@ class AOAIClient(AzureOpenAI):
         self,
         message: str,
         language: str = None,
-        id: str = None
+        id: str = None,
+        history: list = None
     ) -> str:
         """
-        AOAI chat completion.
+        AOAI chat completion with conversation history.
         """
-        # Add user message:
+        # Initialize messages with system prompt and conversation history
+        messages = []
+        
+        # Add system message if available
+        if hasattr(self, 'messages') and self.messages and self.messages[0].get('role') == 'system':
+            messages.append(self.messages[0])
+        
+        # Add conversation history if provided
+        if history:
+            for msg in history:
+                # Convert ChatMessage to OpenAI format
+                role = "assistant" if msg.role.lower() in ["system", "assistant"] else "user"
+                messages.append({"role": role, "content": msg.content})
+        
+        # Add current user message:
         prompt = self.generate_rag_prompt(message) if self.use_rag else message
-        self.messages.append({"role": "user", "content": prompt})
+        messages.append({"role": "user", "content": prompt})
 
         if self.function_calling:
+            # For function calling, use the instance messages
+            self.messages = messages
             function_results = self.call_functions(language=language, id=id)
             if self.return_functions:
                 # Return function-call results directly:
                 return function_results
 
-        # Call chat API:
+        # Call chat API with full conversation context:
         response = self.chat.completions.create(
             model=self.deployment,
-            messages=self.messages
+            messages=messages
         )
         response_message = response.choices[0].message
         self.logger.info(f"Model response: {response_message}")
-        self.messages.append(response_message)
 
         return response_message.content

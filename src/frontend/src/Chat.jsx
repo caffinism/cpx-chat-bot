@@ -21,10 +21,9 @@ const Chat = () => {
 
     const createSystemInput = (userMessageContent) => {
 
-        const lastTwoMessages = messages.slice(-2);
-
-        const historyMessages = needMoreInfo ? lastTwoMessages : [];
-        console.log(historyMessages);
+        // Send last 10 messages to maintain conversation context
+        const historyMessages = messages.slice(-10);
+        console.log("Sending history messages:", historyMessages);
 
         return {
             method: "POST",
