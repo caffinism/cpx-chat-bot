@@ -9,9 +9,10 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
-from semantic_kernel_orchestrator import SemanticKernelOrchestrator
-from azure.identity.aio import DefaultAzureCredential
-from semantic_kernel.agents import AzureAIAgent
+# Removed unused imports for direct RAG mode
+# from semantic_kernel_orchestrator import SemanticKernelOrchestrator
+# from azure.identity.aio import DefaultAzureCredential
+# from semantic_kernel.agents import AzureAIAgent
 from utils import get_azure_credential
 from aoai_client import AOAIClient, get_prompt
 from azure.search.documents import SearchClient
@@ -35,18 +36,9 @@ class ChatRequest(BaseModel):
     history: List[ChatMessage]
 
 
-# Environment variables
-PROJECT_ENDPOINT = os.environ.get("AGENTS_PROJECT_ENDPOINT")
+# Environment variables for direct RAG mode
 MODEL_NAME = os.environ.get("AOAI_DEPLOYMENT")
-CONFIG_DIR = os.environ.get("CONFIG_DIR", ".")
-config_file = os.path.join(CONFIG_DIR, "config.json")
-
-# Read config.json file from the config directory
-if os.path.exists(config_file):
-    with open(config_file, "r") as f:
-        AGENT_IDS = json.load(f)
-else:
-    AGENT_IDS = {}
+print(f"Using MODEL_NAME: {MODEL_NAME} for direct RAG mode")
 
 # Comment out for local testing:
 # AGENT_IDS = {
@@ -58,19 +50,8 @@ else:
 #     "TRANSLATION_AGENT_ID": os.environ.get("TRANSLATION_AGENT_ID"),
 # }
 
-# Check if all required agent IDs are present
-required_agents = [
-    "TRIAGE_AGENT_ID",
-    "HEAD_SUPPORT_AGENT_ID",
-    "MEDICAL_AGENT_ID",
-    "TRANSLATION_AGENT_ID"
-]
-
-missing_agents = [agent for agent in required_agents if not AGENT_IDS.get(agent)]
-if missing_agents:
-    error_msg = f"Missing required agent IDs: {', '.join(missing_agents)}"
-    logging.error(error_msg)
-    raise ValueError(error_msg)
+# Skip agent ID validation - using direct RAG mode
+print("Direct RAG mode enabled - skipping agent orchestration setup")
 
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "dist"))
 # log dist_dir
@@ -129,11 +110,10 @@ def fallback_function(
     return rag_client.chat_completion(query, history=history)
 
 
-# Function to handle processing and orchestrating a chat message with utterance extraction, fallback handling, and PII redaction
+# Simplified function for direct RAG medical consultation
 async def orchestrate_chat(
     message: str,
     history: list[ChatMessage],
-    orchestrator: SemanticKernelOrchestrator,
     chat_id: int
 ) -> tuple[list[str], bool]:
 
@@ -159,19 +139,15 @@ async def orchestrate_chat(
             )
 
         try:
-            # Try semantic kernel orchestration first
-            orchestrator = app.state.orchestrator
-            response, need_more_info = await orchestrator.process_message(task)
-
-            if isinstance(response, dict) and response.get("error"):
-                # If semantic kernel fails, use fallback
-                print(f"Semantic kernel failed, using fallback for: {message}")
-                response = fallback_function(
-                    message,
-                    "en",  # Assuming English for simplicity, adjust as needed
-                    chat_id,
-                    history
-                )
+            # Skip complex orchestration - go directly to RAG for medical consultation
+            print(f"Direct RAG mode: processing medical consultation for: {message}")
+            response = fallback_function(
+                message,  # Use original Korean message directly
+                "ko",     # Korean language
+                chat_id,
+                history
+            )
+            need_more_info = True  # Always allow follow-up questions for medical consultation
             responses.append(response)
 
         except Exception as e:
@@ -192,33 +168,16 @@ async def orchestrate_chat(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Setup app
+    # Simple setup for direct RAG mode
     try:
         logging.basicConfig(level=logging.WARNING)
-
-        print("Setting up Azure credentials and client...")
-        print(f"Using PROJECT_ENDPOINT: {PROJECT_ENDPOINT}")
-        print(f"Using MODEL_NAME: {MODEL_NAME}")
-
-        async with DefaultAzureCredential(exclude_interactive_browser_credential=False) as creds:
-            async with AzureAIAgent.create_client(credential=creds, endpoint=PROJECT_ENDPOINT) as client:
-                orchestrator = SemanticKernelOrchestrator(
-                    client,
-                    MODEL_NAME,
-                    PROJECT_ENDPOINT,
-                    AGENT_IDS,
-                    fallback_function,
-                    3
-                )
-                await orchestrator.create_agent_group_chat()
-
-                # Store in app state
-                app.state.creds = creds
-                app.state.client = client
-                app.state.orchestrator = orchestrator
-
-                # Yield control back to FastAPI lifespan
-                yield
+        print("Direct RAG mode - simplified startup without agent orchestration")
+        
+        # Store minimal app state for direct RAG mode
+        app.state.direct_rag_mode = True
+        
+        # Yield control back to FastAPI lifespan
+        yield
 
     except Exception as e:
         logging.error(f"Error during setup: {e}")
@@ -241,11 +200,9 @@ async def serve_frontend():
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # Grab the orchestrator from app state and orchestrate chat message
-        orchestrator = app.state.orchestrator
-        # pass in message and history
-        responses, need_more_info = await orchestrate_chat(request.message, request.history, orchestrator, chat_id=0)
-        print("[APP]: need_more_info:", need_more_info)
+        # Direct RAG mode - no orchestrator needed
+        responses, need_more_info = await orchestrate_chat(request.message, request.history, chat_id=0)
+        print("[APP]: Direct RAG response generated, need_more_info:", need_more_info)
         return JSONResponse(
             content={
                 "messages": responses,
