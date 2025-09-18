@@ -93,6 +93,11 @@ def route_head_support_message(last_message: ChatMessageContent, participant_des
         parsed = json.loads(last_message.content)
         route = parsed.get("target_agent")
 
+        # Normalize/guard: map unknown or fallback to MedicalConsultationAgent
+        if not route or route == "fallback_function" or route not in participant_descriptions:
+            print(f"[HeadSupportAgent] Unknown or unsupported target '{route}', defaulting to MedicalConsultationAgent")
+            route = "MedicalConsultationAgent"
+
         print("[HeadSupportAgent] Routing to target custom agent:", route)
         return StringResult(
             result=next((agent for agent in participant_descriptions.keys() if agent == route), None),
@@ -100,9 +105,10 @@ def route_head_support_message(last_message: ChatMessageContent, participant_des
         )
     except Exception as e:
         print(f"[SYSTEM]: Error processing HeadSupportAgent message: {e}")
+        # Fallback to a valid default agent to avoid None result validation error
         return StringResult(
-            result=None,
-            reason="Error processing HeadSupportAgent message."
+            result="MedicalConsultationAgent",
+            reason="Error processing HeadSupportAgent message. Defaulting to MedicalConsultationAgent."
         )
 
 
