@@ -7,9 +7,42 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [needMoreInfo, setNeedMoreInfo] = useState(false);
+    const [isWelcomeStreaming, setIsWelcomeStreaming] = useState(false);
+    const [streamedWelcome, setStreamedWelcome] = useState('');
 
     const messageEndRef = useRef(null);
-    const welcomeMessage = 'Ask a question...';
+    const welcomeMessage = `안녕하세요! CPX 의료 상담 AI입니다. 🩺
+
+증상을 자세히 말씀해 주시면 정확한 진단과 치료 가이드를 드려요.
+
+**도움이 되는 정보:**
+• 언제부터, 어디가, 어떻게 아픈지
+• 언제 더 심해지거나 완화되는지  
+• 동반 증상(열/구토/어지럼 등)
+• 복용약물이나 기존 질환
+
+무엇이든 편하게 물어보세요! 💬`;
+
+    // Welcome message streaming effect
+    useEffect(() => {
+        if (messages.length === 0) {
+            setIsWelcomeStreaming(true);
+            setStreamedWelcome('');
+            
+            const streamText = async () => {
+                // Wait 1 second before starting
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                for (let i = 0; i <= welcomeMessage.length; i++) {
+                    setStreamedWelcome(welcomeMessage.slice(0, i));
+                    await new Promise(resolve => setTimeout(resolve, 30)); // 30ms per character
+                }
+                setIsWelcomeStreaming(false);
+            };
+            
+            streamText();
+        }
+    }, [messages.length]);
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -21,8 +54,8 @@ const Chat = () => {
 
     const createSystemInput = (userMessageContent) => {
 
-        // Send last 10 messages to maintain conversation context
-        const historyMessages = messages.slice(-10);
+        // Send last 14 messages to maintain conversation context (7 user + 7 system)
+        const historyMessages = messages.slice(-14);
         console.log("Sending history messages:", historyMessages);
 
         return {
@@ -89,16 +122,35 @@ const Chat = () => {
     return (
         <div className="chat-container">
             <div className="chat-messages">
-                {messages.length == 0 && (<div className="message.content">{welcomeMessage}</div>)}
+                {messages.length === 0 && (
+                    <div className="message agent">
+                        <div className="message-content">
+                            <h3 className="message-header">🩺 AI 의사</h3>
+                            <Markdown className="message-text streaming">
+                                {streamedWelcome}
+                                {isWelcomeStreaming && <span className="cursor">|</span>}
+                            </Markdown>
+                        </div>
+                    </div>
+                )}
                 {messages.map((message, index) => (
-                    <div key={index} tabindex="0" className={message.role === 'user' ? "message.user" : "message.agent"}>
-                        <div className="message">
-                            <h3 className="message-header">{message.role}</h3>
-                            <Markdown className="message.content">{message.content}</Markdown>
+                    <div key={index} tabindex="0" className={message.role === 'user' ? "message user" : "message agent"}>
+                        <div className="message-content">
+                            <h3 className="message-header">{message.role === 'user' ? '👤 환자' : '🩺 AI 의사'}</h3>
+                            <Markdown className="message-text">{message.content}</Markdown>
                         </div>
                     </div>
                 ))}
-                {isTyping && <p className="message">System is typing...</p>}
+                {isTyping && (
+                    <div className="message agent">
+                        <div className="message-content">
+                            <h3 className="message-header">🩺 AI 의사</h3>
+                            <p className="typing-indicator">
+                                진단 중입니다<span className="dots">...</span>
+                            </p>
+                        </div>
+                    </div>
+                )}
                 <div ref={messageEndRef}/>
             </div>
             <form
