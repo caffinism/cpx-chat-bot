@@ -111,8 +111,8 @@ resource container_instance 'Microsoft.ContainerInstance/containerGroups@2024-10
           image: image
           resources: {
             requests: {
-              cpu: 1
-              memoryInGB: 1
+              cpu: 2
+              memoryInGB: 8
             }
           }
           volumeMounts: [
