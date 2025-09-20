@@ -11,15 +11,19 @@ const Chat = () => {
     const [streamedWelcome, setStreamedWelcome] = useState('');
 
     const messageEndRef = useRef(null);
-    const welcomeMessage = `안녕하세요! CPX 의료 상담 AI입니다. 🩺
+    const welcomeMessage = `안녕하세요! 의료 상담 AI입니다. 🩺
 
 증상을 자세히 말씀해 주시면 정확한 진단과 치료 가이드를 드려요.
 
-**도움이 되는 정보:**
-• 언제부터, 어디가, 어떻게 아픈지
+**도움이 되는 정보:**   
+
+• 언제부터, 어디가, 어떻게 아픈지   
+
 • 언제 더 심해지거나 완화되는지  
-• 동반 증상(열/구토/어지럼 등)
-• 복용약물이나 기존 질환
+
+• 동반 증상(열/구토/어지럼 등)   
+
+• 복용약물이나 기존 질환   
 
 무엇이든 편하게 물어보세요! 💬`;
 
@@ -125,18 +129,18 @@ const Chat = () => {
                 {messages.length === 0 && (
                     <div className="message agent">
                         <div className="message-content">
-                            <h3 className="message-header">🩺 AI 의사</h3>
-                            <Markdown className="message-text streaming">
-                                {streamedWelcome}
+                            <h3 className="message-header">🩺 의사</h3>
+                            <div className="message-text streaming">
+                                <Markdown>{streamedWelcome || ''}</Markdown>
                                 {isWelcomeStreaming && <span className="cursor">|</span>}
-                            </Markdown>
+                            </div>
                         </div>
                     </div>
                 )}
                 {messages.map((message, index) => (
-                    <div key={index} tabindex="0" className={message.role === 'user' ? "message user" : "message agent"}>
+                    <div key={index} tabIndex="0" className={message.role === 'User' ? "message user" : "message agent"}>
                         <div className="message-content">
-                            <h3 className="message-header">{message.role === 'user' ? '👤 환자' : '🩺 AI 의사'}</h3>
+                            <h3 className="message-header">{message.role === 'User' ? '👤 환자' : '🩺 의사'}</h3>
                             <Markdown className="message-text">{message.content}</Markdown>
                         </div>
                     </div>
@@ -144,7 +148,7 @@ const Chat = () => {
                 {isTyping && (
                     <div className="message agent">
                         <div className="message-content">
-                            <h3 className="message-header">🩺 AI 의사</h3>
+                            <h3 className="message-header">🩺 의사</h3>
                             <p className="typing-indicator">
                                 진단 중입니다<span className="dots">...</span>
                             </p>
