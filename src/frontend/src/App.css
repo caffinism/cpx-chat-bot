@@ -1,4 +1,4 @@
-/* Reset and Base Styles */
+/* 레트로 병원 스타일 - 최소 CSS */
 * {
   margin: 0;
   padding: 0;
@@ -6,309 +6,323 @@
 }
 
 body {
-  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
+  font-family: 'Gulim', '굴림', '돋움', Dotum, Arial, sans-serif;
+  line-height: 1.4;
+  color: #000;
+  background-color: #ffffff;
 }
 
 .hospital-website {
   min-height: 100vh;
 }
 
-/* Top Banner */
+/* 상단 배너 - 심플하게 */
 .top-banner {
-  background: #2c5aa0;
-  color: white;
-  padding: 8px 0;
-  font-size: 14px;
+  background: #cccccc;
+  color: #000;
+  padding: 5px 0;
+  font-size: 12px;
+  border-bottom: 1px solid #999;
 }
 
 .banner-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
   text-align: center;
+  padding: 0 10px;
 }
 
-/* Hospital Header */
+/* 병원 헤더 - 레트로 스타일 */
 .hospital-header {
-  background: white;
-  border-bottom: 3px solid #2c5aa0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: #f5f5f5;
+  border-bottom: 2px solid #666;
+  padding: 15px 0;
 }
 
 .header-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 0 20px;
 }
 
 .logo-section h1 {
-  font-size: 2.8em;
-  color: #2c5aa0;
-  font-weight: 700;
-  margin-bottom: 5px;
+  font-size: 24px;
+  color: #000;
+  font-weight: bold;
+  margin-bottom: 3px;
+  text-align: center;
 }
 
 .hospital-slogan {
   color: #666;
-  font-size: 1.1em;
-  font-style: italic;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-/* Navigation */
+/* 네비게이션 - 투박하게 */
 .main-nav ul {
   display: flex;
   list-style: none;
-  gap: 40px;
+  justify-content: center;
+  border: 1px solid #999;
+  background: #eeeeee;
+}
+
+.main-nav li {
+  border-right: 1px solid #999;
+}
+
+.main-nav li:last-child {
+  border-right: none;
 }
 
 .main-nav a {
+  display: block;
   text-decoration: none;
-  color: #333;
-  font-size: 1.1em;
-  font-weight: 500;
+  color: #000;
+  font-size: 14px;
+  font-weight: normal;
   padding: 10px 20px;
-  border-radius: 25px;
-  transition: all 0.3s ease;
+  background: #eeeeee;
 }
 
 .main-nav a:hover,
 .main-nav a.active {
-  background: #2c5aa0;
-  color: white;
+  background: #ddd;
+  color: #000;
 }
 
-/* Main Content */
+/* 메인 콘텐츠 - 심플하게 */
 .main-content {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px;
 }
 
-/* Hospital Introduction */
+/* 병원 소개 - 레트로 스타일 */
 .hospital-intro {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  margin-bottom: 40px;
-}
-
-.intro-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
-  padding: 50px;
-  align-items: center;
-}
-
-.intro-text h2 {
-  font-size: 2.2em;
-  color: #2c5aa0;
+  background: #ffffff;
+  border: 1px solid #999;
   margin-bottom: 20px;
 }
 
+.intro-container {
+  padding: 20px;
+}
+
+.intro-text h2 {
+  font-size: 18px;
+  color: #000;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
 .intro-description {
-  font-size: 1.2em;
-  color: #555;
-  margin-bottom: 30px;
-  line-height: 1.8;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 15px;
+  line-height: 1.6;
 }
 
 .hospital-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-top: 30px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  padding: 10px;
 }
 
 .stat-item {
+  display: inline-block;
   text-align: center;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  border: 2px solid #e9ecef;
+  padding: 10px;
+  margin: 5px;
+  background: #fff;
+  border: 1px solid #999;
+  width: 120px;
 }
 
 .stat-item h3 {
-  font-size: 2em;
-  color: #2c5aa0;
-  margin-bottom: 5px;
+  font-size: 16px;
+  color: #000;
+  margin-bottom: 3px;
+  font-weight: bold;
 }
 
 .stat-item p {
   color: #666;
-  font-size: 0.9em;
+  font-size: 12px;
 }
 
 .intro-image {
   text-align: center;
+  margin-top: 15px;
 }
 
 .hospital-building {
-  background: linear-gradient(135deg, #2c5aa0, #1e3d72);
-  padding: 40px;
-  border-radius: 15px;
-  color: white;
+  background: #eeeeee;
+  padding: 20px;
+  border: 2px solid #999;
+  color: #000;
 }
 
 .building-icon {
-  font-size: 4em;
-  margin-bottom: 15px;
+  font-size: 30px;
+  margin-bottom: 5px;
 }
 
-/* Quick Menu */
+/* 빠른 메뉴 - 투박하게 */
 .quick-menu {
-  margin: 40px 0;
+  margin: 20px 0;
 }
 
 .quick-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  border: 1px solid #999;
+  background: #f5f5f5;
+  padding: 10px;
 }
 
 .quick-item {
-  background: white;
-  padding: 30px 20px;
+  display: inline-block;
+  background: #fff;
+  padding: 15px 10px;
   text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+  border: 1px solid #999;
+  margin: 5px;
+  width: 140px;
   cursor: pointer;
 }
 
 .quick-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  background: #f0f0f0;
 }
 
 .quick-item.ai-consultation {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: #e0e0e0;
+  border: 2px solid #666;
 }
 
 .quick-icon {
-  font-size: 2.5em;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 5px;
+  display: block;
 }
 
 .quick-item h4 {
-  font-size: 1.2em;
-  margin-bottom: 5px;
+  font-size: 12px;
+  margin-bottom: 3px;
+  font-weight: bold;
+  color: #000;
 }
 
 .quick-item p {
-  font-size: 0.9em;
+  font-size: 11px;
   color: #666;
 }
 
-.quick-item.ai-consultation p {
-  color: rgba(255,255,255,0.9);
-}
-
-/* Departments */
+/* 진료과 - 표 스타일 */
 .departments-preview {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  padding: 50px;
-  margin: 40px 0;
+  background: #ffffff;
+  border: 1px solid #999;
+  margin: 20px 0;
 }
 
 .section-container h2 {
-  text-align: center;
-  font-size: 2.2em;
-  color: #2c5aa0;
-  margin-bottom: 40px;
+  font-size: 16px;
+  color: #000;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #999;
 }
 
 .departments-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
+  border-collapse: collapse;
+  width: 100%;
+  display: table;
 }
 
 .dept-card {
-  background: #f8f9fa;
-  padding: 30px;
-  border-radius: 10px;
-  border-left: 5px solid #2c5aa0;
+  display: table-cell;
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #ccc;
+  vertical-align: top;
+  width: 25%;
 }
 
 .dept-card h3 {
-  font-size: 1.5em;
-  color: #2c5aa0;
-  margin-bottom: 10px;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 8px;
+  font-weight: bold;
+  border-bottom: 1px dotted #999;
+  padding-bottom: 3px;
 }
 
 .dept-card p {
-  color: #555;
-  margin-bottom: 15px;
+  color: #333;
+  font-size: 12px;
+  margin-bottom: 8px;
 }
 
 .dept-card ul {
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .dept-card li {
   color: #666;
-  font-size: 0.9em;
-  margin-bottom: 5px;
+  font-size: 11px;
+  margin-bottom: 2px;
 }
 
-/* Footer */
+/* 푸터 - 심플하게 */
 .hospital-footer {
-  background: #2c5aa0;
-  color: white;
-  padding: 40px 0;
-  margin-top: 60px;
+  background: #f0f0f0;
+  color: #000;
+  padding: 15px 0;
+  margin-top: 30px;
+  border-top: 2px solid #999;
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .footer-info h3 {
-  font-size: 1.8em;
-  margin-bottom: 20px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
 
 .footer-info p {
-  margin-bottom: 8px;
-  opacity: 0.9;
+  margin-bottom: 3px;
+  font-size: 12px;
+  color: #333;
 }
 
 .footer-notice {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.3);
-  font-weight: 500;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #ccc;
+  font-size: 11px;
+  color: #666;
 }
 
-/* Fixed Floating Chat Button */
+/* 플로팅 챗봇 버튼 - 레트로 */
 .floating-chat-button {
   position: fixed !important;
-  bottom: 30px !important;
-  right: 30px !important;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2c5aa0, #1e3d72);
-  border: none;
-  color: white;
-  font-size: 2em;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 60px;
+  height: 60px;
+  background: #999;
+  border: 2px solid #666;
+  color: #000;
+  font-size: 18px;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(44, 90, 160, 0.4);
-  transition: all 0.3s ease;
   z-index: 9999 !important;
   display: flex;
   align-items: center;
@@ -316,96 +330,65 @@ body {
 }
 
 .floating-chat-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 15px 40px rgba(44, 90, 160, 0.6);
+  background: #bbb;
 }
 
 .floating-chat-button.chat-open {
-  background: #e74c3c;
-  transform: rotate(180deg);
+  background: #ccc;
 }
 
 .chat-pulse {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(44, 90, 160, 0.4);
-  animation: pulse 2s infinite;
+  display: none;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* Chat Modal */
+/* 챗봇 모달 - 윈도우 95 스타일 */
 .chat-modal {
   position: fixed !important;
-  bottom: 120px !important;
-  right: 30px !important;
-  width: 400px;
-  height: 600px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  bottom: 90px !important;
+  right: 20px !important;
+  width: 350px;
+  height: 450px;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
   z-index: 9998 !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: modalSlideUp 0.3s ease-out;
-  border: 2px solid #2c5aa0;
-}
-
-@keyframes modalSlideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .chat-modal-header {
-  background: linear-gradient(135deg, #2c5aa0, #1e3d72);
+  background: #008080;
   color: white;
-  padding: 20px;
+  padding: 3px 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 12px;
+  border-bottom: 1px solid #000;
 }
 
 .chat-modal-header h3 {
   margin: 0;
-  font-size: 1.3em;
+  font-size: 12px;
+  font-weight: normal;
 }
 
 .chat-close-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5em;
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+  color: #000;
+  font-size: 12px;
   cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  padding: 1px 6px;
+  width: 16px;
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: background 0.3s ease;
 }
 
 .chat-close-button:hover {
-  background: rgba(255,255,255,0.2);
+  background: #e0e0e0;
 }
 
 .chat-modal-content {
@@ -413,77 +396,66 @@ body {
   overflow: hidden;
 }
 
-/* Chat Container */
+/* 채팅 컨테이너 - 윈도우 스타일 */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: #c0c0c0;
 }
 
 .chat-messages {
-  padding: 20px;
+  padding: 8px;
   flex-grow: 1;
   overflow-y: auto;
-  max-height: calc(100% - 80px);
-  background: #f8f9fa;
+  background: #ffffff;
+  border: 1px inset #c0c0c0;
+  margin: 2px;
+  font-size: 12px;
 }
 
 .message {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-}
-
-.message.user {
-  align-items: flex-end;
-}
-
-.message.agent {
-  align-items: flex-start;
+  margin-bottom: 8px;
 }
 
 .message-content {
-  max-width: 80%;
-  background: white;
-  border-radius: 18px;
-  padding: 15px 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 5px 8px;
+  border: 1px solid #999;
+  margin-bottom: 3px;
 }
 
 .message.user .message-content {
-  background: linear-gradient(135deg, #2c5aa0, #1e3d72);
-  color: white;
+  background: #ffffcc;
+  margin-left: 50px;
 }
 
 .message.agent .message-content {
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: #f0f0f0;
+  margin-right: 50px;
 }
 
 .message-header {
-  font-size: 0.9em;
-  font-weight: 600;
-  margin-bottom: 8px;
-  opacity: 0.8;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 3px;
+  color: #000;
 }
 
 .message-text {
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.3;
+  font-size: 12px;
 }
 
-/* Streaming Animation */
-.streaming {
-  position: relative;
-}
-
+/* 커서 애니메이션 - 심플하게 */
 .cursor {
   display: inline-block;
-  background: #2c5aa0;
-  width: 2px;
-  height: 1.2em;
+  background: #000;
+  width: 1px;
+  height: 12px;
   animation: blink 1s infinite;
-  margin-left: 2px;
+  margin-left: 1px;
 }
 
 @keyframes blink {
@@ -491,165 +463,93 @@ body {
   51%, 100% { opacity: 0; }
 }
 
-/* Typing Indicator */
+/* 타이핑 인디케이터 */
 .typing-indicator {
-  display: flex;
-  align-items: center;
   margin: 0;
-  color: #2c5aa0;
-  font-weight: 500;
+  color: #666;
+  font-size: 11px;
 }
 
-.dots {
-  display: inline-block;
-  margin-left: 5px;
-}
-
-.dots::after {
-  content: '...';
-  animation: typing 1.5s infinite;
-}
-
-@keyframes typing {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
-}
-
-/* Chat Input Form */
+/* 채팅 입력 폼 - 윈도우 스타일 */
 .chat-input-form {
   display: flex;
-  padding: 15px 20px;
-  border-top: 1px solid #e9ecef;
-  background: white;
+  padding: 4px;
+  border-top: 1px solid #999;
+  background: #c0c0c0;
   margin: 0;
 }
 
 .chat-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  font-size: 1em;
-  margin-right: 10px;
-  outline: none;
-  transition: border-color 0.3s ease;
+  padding: 3px 6px;
+  border: 1px inset #c0c0c0;
+  font-size: 12px;
+  margin-right: 4px;
   font-family: inherit;
-}
-
-.chat-input:focus {
-  border-color: #2c5aa0;
-  box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+  background: #ffffff;
 }
 
 .chat-submit-button {
-  background: linear-gradient(135deg, #2c5aa0, #1e3d72);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 20px;
-  font-size: 1em;
-  font-weight: 600;
+  background: #c0c0c0;
+  color: #000;
+  border: 1px outset #c0c0c0;
+  padding: 3px 12px;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .chat-submit-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(44, 90, 160, 0.4);
+  background: #e0e0e0;
 }
 
 .chat-submit-button:disabled {
-  opacity: 0.6;
+  background: #999;
+  color: #666;
   cursor: not-allowed;
-  transform: none;
 }
 
-/* Responsive Design */
+/* 반응형 - 모바일 */
 @media (max-width: 768px) {
-  .chat-modal {
-    width: 90% !important;
-    right: 5% !important;
-    bottom: 100px !important;
-    height: 70vh !important;
-  }
-  
-  .floating-chat-button {
-    width: 60px !important;
-    height: 60px !important;
-    font-size: 1.8em !important;
-    bottom: 20px !important;
-    right: 20px !important;
-  }
-  
   .header-container {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .main-nav {
-    margin-top: 20px;
+    padding: 0 10px;
   }
   
   .main-nav ul {
-    gap: 15px;
     flex-wrap: wrap;
-    justify-content: center;
   }
   
   .main-nav a {
     padding: 8px 15px;
-    font-size: 1em;
+    font-size: 12px;
+  }
+  
+  .main-content {
+    padding: 10px;
   }
   
   .intro-container {
-    grid-template-columns: 1fr;
-    padding: 30px;
-  }
-  
-  .hospital-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .quick-container {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 15px;
   }
   
   .departments-grid {
-    grid-template-columns: 1fr;
+    display: block;
   }
   
-  .logo-section h1 {
-    font-size: 2.2em;
+  .dept-card {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
   }
   
-  .intro-text h2 {
-    font-size: 1.8em;
+  .chat-modal {
+    width: 90% !important;
+    right: 5% !important;
+    height: 60vh !important;
   }
   
-  .section-container h2 {
-    font-size: 1.8em;
-  }
-  
-  .departments-preview {
-    padding: 30px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hospital-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .logo-section h1 {
-    font-size: 1.8em;
-  }
-  
-  .intro-description {
-    font-size: 1em;
+  .floating-chat-button {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 16px !important;
   }
 }
