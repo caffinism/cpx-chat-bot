@@ -73,6 +73,7 @@ class AppointmentOrchestrator:
 
         # 예약 프롬프트로 응답 생성
         prompt = self.booking_prompt.format(
+            department=booking_info.department,
             consultation_summary=booking_info.consultation_summary,
             collected_info=collected_info_str,
             query=message
