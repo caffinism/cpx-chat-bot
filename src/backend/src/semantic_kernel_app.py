@@ -153,7 +153,13 @@ async def orchestrate_chat(
                 # If no consultation text found, check if the last assistant message was a booking offer
                 if not consultation_text:
                     last_assistant_msg = _get_last_assistant_message(history)
-                    if last_assistant_msg and "예약을 잡아드릴까요" in last_assistant_msg:
+                    # Check for "예약" and a question phrase to make the detection more robust
+                    is_booking_offer = (
+                        last_assistant_msg and
+                        "예약" in last_assistant_msg and
+                        any(q in last_assistant_msg for q in ["드릴까요", "원하시나요", "하시겠어요", "도와드릴까요"])
+                    )
+                    if is_booking_offer:
                         # Extract department from the booking offer message
                         consultation_text = _extract_consultation_from_booking_offer(last_assistant_msg)
                 
