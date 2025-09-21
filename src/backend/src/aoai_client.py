@@ -134,9 +134,10 @@ class AOAIClient(AzureOpenAI):
     def generate_rag_prompt(
         self,
         query: str
-    ) -> str:
+    ) -> tuple[str, str]:
         """
         Generates RAG grounding prompt given query and search client.
+        Returns (system_prompt, user_prompt) tuple.
         """
         self.logger.info("Calling search client")
         vector_query = VectorizableTextQuery(
@@ -155,12 +156,19 @@ class AOAIClient(AzureOpenAI):
             [f'TITLE: {doc["title"]}, CONTENT: {doc["chunk"]}' for doc in search_results]
         )
 
-        prompt = RAG_GROUNDING_PROMPT.format(
+        # Split the RAG prompt into system and user parts
+        full_prompt = RAG_GROUNDING_PROMPT.format(
             query=query,
             sources=sources_formatted
         )
+        
+        # Extract system part (everything before # Query)
+        system_part = full_prompt.split("# Query")[0].strip()
+        
+        # Extract user part (Query and Sources sections)
+        user_part = full_prompt.split("# Query")[1].strip() if "# Query" in full_prompt else f"# Query\n{query}\n\n# Sources\n{sources_formatted}"
 
-        return prompt
+        return system_part, user_part
 
     def chat_completion(
         self,
@@ -187,8 +195,20 @@ class AOAIClient(AzureOpenAI):
                 messages.append({"role": role, "content": msg.content})
         
         # Add current user message:
-        prompt = self.generate_rag_prompt(message) if self.use_rag else message
-        messages.append({"role": "user", "content": prompt})
+        if self.use_rag:
+            # For RAG, split into system and user messages for better instruction following
+            system_prompt, user_prompt = self.generate_rag_prompt(message)
+            # Add system prompt as system message (overrides any existing system message)
+            messages = [{"role": "system", "content": system_prompt}]
+            # Re-add conversation history after system message
+            if history:
+                for msg in history:
+                    role = "assistant" if msg.role.lower() in ["system", "assistant"] else "user"
+                    messages.append({"role": role, "content": msg.content})
+            # Add user prompt as user message
+            messages.append({"role": "user", "content": user_prompt})
+        else:
+            messages.append({"role": "user", "content": message})
 
         if self.function_calling:
             # For function calling, use the instance messages

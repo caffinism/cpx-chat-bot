@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from utils import get_azure_credential
 from aoai_client import AOAIClient, get_prompt
 from azure.search.documents import SearchClient
+from appointment_orchestrator import AppointmentOrchestrator
 
 from typing import List
 
@@ -87,6 +88,10 @@ extract_client = AOAIClient(
 PII_ENABLED = os.environ.get("PII_ENABLED", "false").lower() == "true"
 print(f"PII_ENABLED: {PII_ENABLED}")
 
+# Appointment orchestrator:
+appointment_orchestrator = AppointmentOrchestrator(rag_client)
+print("Appointment orchestrator initialized.")
+
 
 # Fallback function (RAG) definition:
 def fallback_function(
@@ -110,7 +115,7 @@ def fallback_function(
     return rag_client.chat_completion(query, history=history)
 
 
-# Simplified function for direct RAG medical consultation
+# Enhanced function for medical consultation with appointment booking
 async def orchestrate_chat(
     message: str,
     history: list[ChatMessage],
@@ -139,16 +144,36 @@ async def orchestrate_chat(
             )
 
         try:
-            # Skip complex orchestration - go directly to RAG for medical consultation
-            print(f"Direct RAG mode: processing medical consultation for: {message}")
-            response = fallback_function(
-                message,  # Use original Korean message directly
-                "ko",     # Korean language
-                chat_id,
-                history
-            )
-            need_more_info = True  # Always allow follow-up questions for medical consultation
-            responses.append(response)
+            # Check if this is a booking request
+            if appointment_orchestrator.is_booking_request(message):
+                print(f"Booking request detected: {message}")
+                # Check if we have consultation history to start booking
+                consultation_text = _extract_consultation_from_history(history)
+                if consultation_text:
+                    response = appointment_orchestrator.start_booking_process(str(chat_id), consultation_text)
+                    responses.append(response)
+                    need_more_info = True
+                else:
+                    responses.append("의료 상담을 먼저 완료해주세요.")
+            else:
+                # Check if we're in booking mode
+                booking_info = appointment_orchestrator.appointment_service.get_booking_info(str(chat_id))
+                if booking_info:
+                    print(f"Processing booking message: {message}")
+                    response, booking_complete = appointment_orchestrator.process_booking_message(str(chat_id), message)
+                    responses.append(response)
+                    need_more_info = not booking_complete
+                else:
+                    # Regular medical consultation
+                    print(f"Direct RAG mode: processing medical consultation for: {message}")
+                    response = fallback_function(
+                        message,  # Use original Korean message directly
+                        "ko",     # Korean language
+                        chat_id,
+                        history
+                    )
+                    need_more_info = True  # Always allow follow-up questions for medical consultation
+                    responses.append(response)
 
         except Exception as e:
             logging.error(f"Error processing utterance: {e}")
@@ -164,6 +189,16 @@ async def orchestrate_chat(
             pii_redacter.remove(id=chat_id)
 
     return responses, need_more_info
+
+
+def _extract_consultation_from_history(history: list[ChatMessage]) -> str:
+    """대화 히스토리에서 의료 상담 내용 추출"""
+    consultation_parts = []
+    for msg in history:
+        if msg.role == "assistant" and any(keyword in msg.content for keyword in ["추정진단", "권장 검사", "치료 및 처치", "의료진 연계", "환자교육", "예후"]):
+            consultation_parts.append(msg.content)
+    
+    return "\n".join(consultation_parts) if consultation_parts else ""
 
 
 @asynccontextmanager
@@ -200,9 +235,9 @@ async def serve_frontend():
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
-        # Direct RAG mode - no orchestrator needed
+        # Enhanced mode with appointment booking
         responses, need_more_info = await orchestrate_chat(request.message, request.history, chat_id=0)
-        print("[APP]: Direct RAG response generated, need_more_info:", need_more_info)
+        print("[APP]: Response generated, need_more_info:", need_more_info)
         return JSONResponse(
             content={
                 "messages": responses,
@@ -211,6 +246,62 @@ async def chat_endpoint(request: ChatRequest):
 
     except Exception as e:
         logging.error(f"Error in chat endpoint: {e}")
+        return JSONResponse(
+            content={"error": "An unexpected error occurred"},
+            status_code=500
+        )
+
+
+# Define the appointment lookup endpoint
+@app.get("/appointment/{appointment_id}")
+async def get_appointment(appointment_id: str):
+    try:
+        appointment = appointment_orchestrator.appointment_service.get_appointment(appointment_id)
+        if not appointment:
+            return JSONResponse(
+                content={"error": "Appointment not found"},
+                status_code=404
+            )
+        
+        return JSONResponse(
+            content={
+                "appointment_id": appointment.appointment_id,
+                "patient_name": appointment.patient_name,
+                "department": appointment.department,
+                "appointment_date": appointment.preferred_date,
+                "appointment_time": appointment.preferred_time,
+                "status": appointment.status,
+                "created_at": appointment.created_at.isoformat()
+            },
+            status_code=200
+        )
+    
+    except Exception as e:
+        logging.error(f"Error in appointment lookup: {e}")
+        return JSONResponse(
+            content={"error": "An unexpected error occurred"},
+            status_code=500
+        )
+
+
+# Define the appointment cancellation endpoint
+@app.post("/appointment/{appointment_id}/cancel")
+async def cancel_appointment(appointment_id: str):
+    try:
+        success = appointment_orchestrator.appointment_service.cancel_appointment(appointment_id)
+        if not success:
+            return JSONResponse(
+                content={"error": "Appointment not found"},
+                status_code=404
+            )
+        
+        return JSONResponse(
+            content={"message": "Appointment cancelled successfully"},
+            status_code=200
+        )
+    
+    except Exception as e:
+        logging.error(f"Error in appointment cancellation: {e}")
         return JSONResponse(
             content={"error": "An unexpected error occurred"},
             status_code=500

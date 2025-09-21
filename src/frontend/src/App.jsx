@@ -48,21 +48,21 @@ const App = () => {
             <div className="intro-text">
               <h2>스콧 의료원을 소개합니다</h2>
               <p className="intro-description">
-                1975년 개원 이래 48년간 지역사회와 함께 성장해온 스콧 의료원은<br/>
+                스콧 의료원은<br/>
                 최첨단 의료장비와 풍부한 임상경험을 바탕으로<br/>
                 환자 중심의 양질의 의료서비스를 제공하고 있습니다.
               </p>
               <div className="hospital-stats">
                 <div className="stat-item">
-                  <h3>15개</h3>
+                  <h3>5개</h3>
                   <p>전문 진료과</p>
                 </div>
                 <div className="stat-item">
-                  <h3>120명</h3>
+                  <h3>20명</h3>
                   <p>전문의료진</p>
                 </div>
                 <div className="stat-item">
-                  <h3>500병상</h3>
+                  <h3>50병상</h3>
                   <p>입원 시설</p>
                 </div>
                 <div className="stat-item">
@@ -73,7 +73,6 @@ const App = () => {
             </div>
             <div className="intro-image">
               <div className="hospital-building">
-                <div className="building-icon">🏥</div>
                 <p>본관 7층 건물</p>
               </div>
             </div>
@@ -84,22 +83,18 @@ const App = () => {
         <section className="quick-menu">
           <div className="quick-container">
             <div className="quick-item">
-              <div className="quick-icon">📅</div>
               <h4>온라인 예약</h4>
               <p>간편하게 진료예약</p>
             </div>
             <div className="quick-item">
-              <div className="quick-icon">🔍</div>
               <h4>검사결과 조회</h4>
               <p>진료결과 확인</p>
             </div>
             <div className="quick-item">
-              <div className="quick-icon">💊</div>
               <h4>처방전 발급</h4>
               <p>약국 연계서비스</p>
             </div>
             <div className="quick-item ai-consultation">
-              <div className="quick-icon">🤖</div>
               <h4>AI 의료상담</h4>
               <p>24시간 즉시상담</p>
             </div>
@@ -118,24 +113,6 @@ const App = () => {
                   <li>• 위내시경, 대장내시경</li>
                   <li>• 심전도, 심초음파</li>
                   <li>• 당뇨, 고혈압 관리</li>
-                </ul>
-              </div>
-              <div className="dept-card">
-                <h3>산부인과</h3>
-                <p>여성 건강과 임신, 출산 전문 케어</p>
-                <ul>
-                  <li>• 임신 관리 및 출산</li>
-                  <li>• 부인과 질환 치료</li>
-                  <li>• 갱년기 관리</li>
-                </ul>
-              </div>
-              <div className="dept-card">
-                <h3>소아과</h3>
-                <p>신생아부터 청소년까지 성장발달 관리</p>
-                <ul>
-                  <li>• 예방접종</li>
-                  <li>• 성장발달 검사</li>
-                  <li>• 소아 질환 치료</li>
                 </ul>
               </div>
               <div className="dept-card">
@@ -160,7 +137,7 @@ const App = () => {
             <p>주소: 서울특별시 강남구 의료원로 123 (우: 06234)</p>
             <p>대표번호: 02-1234-5678 | 응급실: 119</p>
             <p>진료시간: 평일 09:00~18:00, 토요일 09:00~13:00</p>
-            <p className="footer-notice">⚠️ 본 AI 상담은 의료 참고용이며, 응급상황 시 즉시 응급실을 방문하세요.</p>
+            <p className="footer-notice">본 AI 상담은 의료 참고용이며, 응급상황 시 즉시 응급실을 방문하세요.</p>
           </div>
         </div>
       </footer>

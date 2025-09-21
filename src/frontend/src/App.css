@@ -1,4 +1,4 @@
-/* 레트로 병원 스타일 - 최소 CSS */
+/* 레트로 병원 스타일 - 화면 크게 */
 * {
   margin: 0;
   padding: 0;
@@ -10,55 +10,56 @@ body {
   line-height: 1.4;
   color: #000;
   background-color: #ffffff;
+  font-size: 16px; /* 기본 폰트 크기 증가 */
 }
 
 .hospital-website {
   min-height: 100vh;
 }
 
-/* 상단 배너 - 심플하게 */
+/* 상단 배너 - 크게 */
 .top-banner {
   background: #cccccc;
   color: #000;
-  padding: 5px 0;
-  font-size: 12px;
+  padding: 8px 0;
+  font-size: 16px;
   border-bottom: 1px solid #999;
 }
 
 .banner-content {
   text-align: center;
-  padding: 0 10px;
-}
-
-/* 병원 헤더 - 레트로 스타일 */
-.hospital-header {
-  background: #f5f5f5;
-  border-bottom: 2px solid #666;
-  padding: 15px 0;
-}
-
-.header-container {
-  max-width: 1000px;
-  margin: 0 auto;
   padding: 0 20px;
 }
 
+/* 병원 헤더 - 크게 */
+.hospital-header {
+  background: #f5f5f5;
+  border-bottom: 2px solid #666;
+  padding: 20px 0;
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
 .logo-section h1 {
-  font-size: 24px;
+  font-size: 36px;
   color: #000;
   font-weight: bold;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   text-align: center;
 }
 
 .hospital-slogan {
   color: #666;
-  font-size: 12px;
+  font-size: 16px;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-/* 네비게이션 - 투박하게 */
+/* 네비게이션 - 크게 */
 .main-nav ul {
   display: flex;
   list-style: none;
@@ -79,9 +80,9 @@ body {
   display: block;
   text-decoration: none;
   color: #000;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: normal;
-  padding: 10px 20px;
+  padding: 15px 30px;
   background: #eeeeee;
 }
 
@@ -91,36 +92,36 @@ body {
   color: #000;
 }
 
-/* 메인 콘텐츠 - 심플하게 */
+/* 메인 콘텐츠 - 크게 */
 .main-content {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px;
 }
 
-/* 병원 소개 - 레트로 스타일 */
+/* 병원 소개 - 크게 */
 .hospital-intro {
   background: #ffffff;
   border: 1px solid #999;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .intro-container {
-  padding: 20px;
+  padding: 30px;
 }
 
 .intro-text h2 {
-  font-size: 18px;
+  font-size: 28px;
   color: #000;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
 }
 
 .intro-description {
-  font-size: 14px;
+  font-size: 18px;
   color: #333;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   line-height: 1.6;
 }
 
@@ -141,15 +142,15 @@ body {
 }
 
 .stat-item h3 {
-  font-size: 16px;
+  font-size: 24px;
   color: #000;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
 .stat-item p {
   color: #666;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .intro-image {
@@ -207,14 +208,14 @@ body {
 }
 
 .quick-item h4 {
-  font-size: 12px;
-  margin-bottom: 3px;
+  font-size: 18px;
+  margin-bottom: 5px;
   font-weight: bold;
   color: #000;
 }
 
 .quick-item p {
-  font-size: 11px;
+  font-size: 14px;
   color: #666;
 }
 
@@ -226,10 +227,10 @@ body {
 }
 
 .section-container h2 {
-  font-size: 16px;
+  font-size: 24px;
   color: #000;
-  margin-bottom: 15px;
-  padding: 10px;
+  margin-bottom: 20px;
+  padding: 15px;
   background: #f0f0f0;
   border-bottom: 1px solid #999;
 }
@@ -250,18 +251,18 @@ body {
 }
 
 .dept-card h3 {
-  font-size: 14px;
+  font-size: 20px;
   color: #000;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-weight: bold;
   border-bottom: 1px dotted #999;
-  padding-bottom: 3px;
+  padding-bottom: 5px;
 }
 
 .dept-card p {
   color: #333;
-  font-size: 12px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 12px;
 }
 
 .dept-card ul {
@@ -272,8 +273,8 @@ body {
 
 .dept-card li {
   color: #666;
-  font-size: 11px;
-  margin-bottom: 2px;
+  font-size: 14px;
+  margin-bottom: 4px;
 }
 
 /* 푸터 - 심플하게 */
@@ -292,36 +293,36 @@ body {
 }
 
 .footer-info h3 {
-  font-size: 14px;
-  margin-bottom: 8px;
+  font-size: 18px;
+  margin-bottom: 12px;
   font-weight: bold;
 }
 
 .footer-info p {
-  margin-bottom: 3px;
-  font-size: 12px;
+  margin-bottom: 5px;
+  font-size: 16px;
   color: #333;
 }
 
 .footer-notice {
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 15px;
+  padding-top: 12px;
   border-top: 1px solid #ccc;
-  font-size: 11px;
+  font-size: 14px;
   color: #666;
 }
 
-/* 플로팅 챗봇 버튼 - 레트로 */
+/* 플로팅 챗봇 버튼 - 크게 */
 .floating-chat-button {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: #999;
   border: 2px solid #666;
   color: #000;
-  font-size: 18px;
+  font-size: 24px;
   cursor: pointer;
   z-index: 9999 !important;
   display: flex;
@@ -341,13 +342,13 @@ body {
   display: none;
 }
 
-/* 챗봇 모달 - 윈도우 95 스타일 */
+/* 챗봇 모달 - 크게 */
 .chat-modal {
   position: fixed !important;
   bottom: 90px !important;
   right: 20px !important;
-  width: 350px;
-  height: 450px;
+  width: 500px;
+  height: 600px;
   background: #c0c0c0;
   border: 2px outset #c0c0c0;
   z-index: 9998 !important;
@@ -359,17 +360,17 @@ body {
 .chat-modal-header {
   background: #008080;
   color: white;
-  padding: 3px 8px;
+  padding: 8px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 12px;
+  font-size: 16px;
   border-bottom: 1px solid #000;
 }
 
 .chat-modal-header h3 {
   margin: 0;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: normal;
 }
 
@@ -377,11 +378,11 @@ body {
   background: #c0c0c0;
   border: 1px outset #c0c0c0;
   color: #000;
-  font-size: 12px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 1px 6px;
-  width: 16px;
-  height: 14px;
+  padding: 4px 8px;
+  width: 24px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -405,13 +406,13 @@ body {
 }
 
 .chat-messages {
-  padding: 8px;
+  padding: 12px;
   flex-grow: 1;
   overflow-y: auto;
   background: #ffffff;
   border: 1px inset #c0c0c0;
   margin: 2px;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .message {
@@ -420,32 +421,32 @@ body {
 
 .message-content {
   background: #ffffff;
-  padding: 5px 8px;
+  padding: 8px 12px;
   border: 1px solid #999;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .message.user .message-content {
   background: #ffffcc;
-  margin-left: 50px;
+  margin-left: 60px;
 }
 
 .message.agent .message-content {
   background: #f0f0f0;
-  margin-right: 50px;
+  margin-right: 60px;
 }
 
 .message-header {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: bold;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   color: #000;
 }
 
 .message-text {
   margin: 0;
-  line-height: 1.3;
-  font-size: 12px;
+  line-height: 1.4;
+  font-size: 16px;
 }
 
 /* 커서 애니메이션 - 심플하게 */
@@ -470,10 +471,10 @@ body {
   font-size: 11px;
 }
 
-/* 채팅 입력 폼 - 윈도우 스타일 */
+/* 채팅 입력 폼 - 크게 */
 .chat-input-form {
   display: flex;
-  padding: 4px;
+  padding: 8px;
   border-top: 1px solid #999;
   background: #c0c0c0;
   margin: 0;
@@ -481,10 +482,10 @@ body {
 
 .chat-input {
   flex: 1;
-  padding: 3px 6px;
+  padding: 8px 12px;
   border: 1px inset #c0c0c0;
-  font-size: 12px;
-  margin-right: 4px;
+  font-size: 16px;
+  margin-right: 8px;
   font-family: inherit;
   background: #ffffff;
 }
@@ -493,8 +494,8 @@ body {
   background: #c0c0c0;
   color: #000;
   border: 1px outset #c0c0c0;
-  padding: 3px 12px;
-  font-size: 12px;
+  padding: 8px 16px;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -511,7 +512,7 @@ body {
 /* 반응형 - 모바일 */
 @media (max-width: 768px) {
   .header-container {
-    padding: 0 10px;
+    padding: 0 15px;
   }
   
   .main-nav ul {
@@ -519,16 +520,16 @@ body {
   }
   
   .main-nav a {
-    padding: 8px 15px;
-    font-size: 12px;
+    padding: 12px 20px;
+    font-size: 16px;
   }
   
   .main-content {
-    padding: 10px;
+    padding: 20px;
   }
   
   .intro-container {
-    padding: 15px;
+    padding: 20px;
   }
   
   .departments-grid {
@@ -538,18 +539,19 @@ body {
   .dept-card {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
   
   .chat-modal {
-    width: 90% !important;
-    right: 5% !important;
-    height: 60vh !important;
+    width: 95% !important;
+    right: 2.5% !important;
+    height: 70vh !important;
+    width: 450px !important;
   }
   
   .floating-chat-button {
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 16px !important;
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 20px !important;
   }
 }
