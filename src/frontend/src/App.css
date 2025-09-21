@@ -474,6 +474,17 @@ body {
   white-space: pre-wrap;
 }
 
+.message-text ol,
+.message-text ul {
+  padding-left: 25px; /* 숫자 표시를 위한 내부 여백 확보 */
+  margin: 10px 0;
+}
+
+.message-text li {
+  margin-bottom: 5px;
+  padding-left: 5px; /* 숫자와 텍스트 사이 간격 */
+}
+
 /* 커서 애니메이션 - 심플하게 */
 .cursor {
   display: inline-block;
@@ -658,6 +669,17 @@ body {
     white-space: pre-wrap;
   }
   
+  .message-text ol,
+  .message-text ul {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  .message-text li {
+    margin-bottom: 4px;
+    padding-left: 4px;
+  }
+  
   .chat-input-form {
     padding: 6px;
   }
@@ -838,6 +860,17 @@ body {
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
+  }
+  
+  .message-text ol,
+  .message-text ul {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  .message-text li {
+    margin-bottom: 4px;
+    padding-left: 4px;
   }
   
   .chat-input-form {

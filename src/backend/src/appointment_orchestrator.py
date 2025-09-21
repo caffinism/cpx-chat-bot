@@ -13,38 +13,31 @@ class AppointmentOrchestrator:
         self.appointment_service = AppointmentService()
     
     def extract_department_from_consultation(self, consultation_text: str) -> Optional[str]:
-        """상담 내용에서 진료과 추출"""
-        # 의료진 연계 섹션에서 진료과 추출
+        """상담 내용에서 진료과 추출 (강화된 로직)"""
+        # 1. "XX과에 예약을 잡아드릴까요?" 패턴에서 직접 추출 (가장 정확)
+        offer_match = re.search(r"([가-힣]+과)에 예약을 잡아드릴까요\?", consultation_text)
+        if offer_match:
+            return offer_match.group(1).strip()
+
+        # 2. "의료진 연계" 섹션에서 추출
         department_patterns = [
-            r"의료진 연계[:\s]*([^:]+)",
-            r"([가-힣]+과)",
-            r"([가-힣]+내과)",
-            r"([가-힣]+외과)",
-            r"([가-힣]+소아과)",
-            r"([가-힣]+산부인과)",
-            r"([가-힣]+정신과)",
-            r"([가-힣]+피부과)",
-            r"([가-힣]+안과)",
-            r"([가-힣]+이비인후과)",
-            r"([가-힣]+정형외과)",
-            r"([가-힣]+신경과)",
-            r"([가-힣]+흉부외과)",
-            r"([가-힣]+비뇨기과)",
-            r"([가-힣]+마취과)"
+            r"의료진 연계[:\s]*([^:\n]+)",
         ]
-        
         for pattern in department_patterns:
             match = re.search(pattern, consultation_text)
             if match:
-                department = match.group(1).strip()
-                # 일반적인 진료과명으로 정리
-                if "내과" in department and "소화기" not in department:
-                    return "소화기내과"
-                elif "외과" in department and "정형" not in department:
-                    return "일반외과"
-                return department
+                department_text = match.group(1)
+                # "방문" 등의 단어를 제외하고 진료과만 추출
+                dept_match = re.search(r"([가-힣]+과)", department_text)
+                if dept_match:
+                    return dept_match.group(1).strip()
         
-        return "내과"  # 기본값
+        # 3. 일반적인 "XX과" 패턴으로 찾기
+        general_match = re.search(r"([가-힣]+과)", consultation_text)
+        if general_match:
+            return general_match.group(1).strip()
+
+        return "내과"  # 모든 패턴 실패 시 기본값
     
     def handle_booking_request(self, chat_id: str, consultation_text: str, message: str) -> Tuple[str, bool]:
         """Starts a booking session and processes the first user message."""
@@ -72,12 +65,17 @@ class AppointmentOrchestrator:
         # 추출된 정보 업데이트
         if extracted_info:
             self.appointment_service.update_booking_info(chat_id, **extracted_info)
+            # 업데이트된 정보로 다시 로드
             booking_info = self.appointment_service.get_booking_info(chat_id)
         
+        # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
+        collected_info_str = booking_info.to_summary_string()
+
         # 예약 프롬프트로 응답 생성
         prompt = self.booking_prompt.format(
-            query=message,
-            consultation_summary=booking_info.consultation_summary
+            consultation_summary=booking_info.consultation_summary,
+            collected_info=collected_info_str,
+            query=message
         )
         
         response = self.aoai_client.chat_completion(prompt)
