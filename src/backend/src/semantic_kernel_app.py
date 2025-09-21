@@ -149,6 +149,14 @@ async def orchestrate_chat(
                 print(f"Booking request detected: {message}")
                 # Check if we have consultation history to start booking
                 consultation_text = _extract_consultation_from_history(history)
+                
+                # If no consultation text found, check if the last assistant message was a booking offer
+                if not consultation_text:
+                    last_assistant_msg = _get_last_assistant_message(history)
+                    if last_assistant_msg and "예약을 잡아드릴까요" in last_assistant_msg:
+                        # Extract department from the booking offer message
+                        consultation_text = _extract_consultation_from_booking_offer(last_assistant_msg)
+                
                 if consultation_text:
                     response = appointment_orchestrator.start_booking_process(str(chat_id), consultation_text)
                     responses.append(response)
@@ -199,6 +207,30 @@ def _extract_consultation_from_history(history: list[ChatMessage]) -> str:
             consultation_parts.append(msg.content)
     
     return "\n".join(consultation_parts) if consultation_parts else ""
+
+def _get_last_assistant_message(history: list[ChatMessage]) -> str:
+    """마지막 어시스턴트 메시지 반환"""
+    for msg in reversed(history):
+        if msg.role == "assistant":
+            return msg.content
+    return ""
+
+def _extract_consultation_from_booking_offer(booking_offer_msg: str) -> str:
+    """예약 제안 메시지에서 상담 내용 추출"""
+    # 예약 제안 메시지가 나왔다는 것은 이미 상담이 완료되었다는 의미
+    # 간단한 상담 요약을 생성
+    lines = booking_offer_msg.split('\n')
+    consultation_summary = []
+    
+    for line in lines:
+        if any(keyword in line for keyword in ["추정진단", "권장 검사", "치료 및 처치", "의료진 연계", "환자교육", "예후"]):
+            consultation_summary.append(line)
+    
+    if consultation_summary:
+        return "\n".join(consultation_summary)
+    else:
+        # 상담 내용이 명확하지 않으면 기본 상담 완료 메시지
+        return "의료 상담이 완료되었습니다. 전문의 진료가 필요한 상황입니다."
 
 
 @asynccontextmanager
