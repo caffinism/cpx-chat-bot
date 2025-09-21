@@ -144,8 +144,18 @@ async def orchestrate_chat(
             )
 
         try:
-            # Check if this is a booking request
-            if appointment_orchestrator.is_booking_request(message):
+            # Re-order logic to handle booking state first
+            booking_info = appointment_orchestrator.appointment_service.get_booking_info(str(chat_id))
+
+            # STATE 1: We are already in a booking process.
+            if booking_info:
+                print(f"Continuing booking process for message: {message}")
+                response, booking_complete = appointment_orchestrator.process_booking_message(str(chat_id), message)
+                responses.append(response)
+                need_more_info = not booking_complete
+
+            # STATE 2: This message is a request to START booking.
+            elif appointment_orchestrator.is_booking_request(message):
                 print(f"Booking request detected: {message}")
                 # Check if we have consultation history to start booking
                 consultation_text = _extract_consultation_from_history(history)
@@ -164,30 +174,24 @@ async def orchestrate_chat(
                         consultation_text = _extract_consultation_from_booking_offer(last_assistant_msg)
                 
                 if consultation_text:
-                    response = appointment_orchestrator.start_booking_process(str(chat_id), consultation_text)
-                    responses.append(response)
-                    need_more_info = True
-                else:
-                    responses.append("의료 상담을 먼저 완료해주세요.")
-            else:
-                # Check if we're in booking mode
-                booking_info = appointment_orchestrator.appointment_service.get_booking_info(str(chat_id))
-                if booking_info:
-                    print(f"Processing booking message: {message}")
-                    response, booking_complete = appointment_orchestrator.process_booking_message(str(chat_id), message)
+                    response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), consultation_text, message)
                     responses.append(response)
                     need_more_info = not booking_complete
                 else:
-                    # Regular medical consultation
-                    print(f"Direct RAG mode: processing medical consultation for: {message}")
-                    response = fallback_function(
-                        message,  # Use original Korean message directly
-                        "ko",     # Korean language
-                        chat_id,
-                        history
-                    )
-                    need_more_info = True  # Always allow follow-up questions for medical consultation
-                    responses.append(response)
+                    responses.append("의료 상담을 먼저 완료해주세요.")
+            
+            # STATE 3: Regular medical consultation
+            else:
+                # Regular medical consultation
+                print(f"Direct RAG mode: processing medical consultation for: {message}")
+                response = fallback_function(
+                    message,  # Use original Korean message directly
+                    "ko",     # Korean language
+                    chat_id,
+                    history
+                )
+                need_more_info = True  # Always allow follow-up questions for medical consultation
+                responses.append(response)
 
         except Exception as e:
             logging.error(f"Error processing utterance: {e}")
