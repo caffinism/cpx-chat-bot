@@ -12,34 +12,6 @@ class AppointmentOrchestrator:
         self.booking_prompt = get_prompt("appointment_booking.txt")
         self.appointment_service = AppointmentService()
     
-    def is_booking_request(self, message: str) -> bool:
-        """예약 요청인지 확인 (정교화된 로직)"""
-        message_clean = message.strip().lower()
-
-        # 1. "예약", "잡아줘" 등 명시적인 예약 키워드가 포함되어 있는지 확인
-        explicit_booking_indicators = ["예약", "잡아줘", "잡아주", "예약해"]
-        if any(indicator in message_clean for indicator in explicit_booking_indicators):
-            return True
-
-        # 2. "아니요", "싫어요" 등 명확한 거절 표현으로 시작하는지 확인
-        # "괜찮아요"는 긍정과 부정 모두 가능하므로 제외
-        negative_starters = ["아니요", "아니", "싫어", "필요 없어", "안할래", "안해"]
-        if any(message_clean.startswith(starter) for starter in negative_starters):
-            return False
-
-        # 3. "네", "좋아요" 등 긍정적인 답변으로 문장이 시작하는지 확인 (짧은 응답 위주)
-        positive_starters = ["네", "예", "응", "좋아요", "좋습니다", "해주세요", "해줘", "그래요", "그래"]
-        # 문장 전체가 긍정 스타터 중 하나이거나, 긍정 스타터로 시작하고 짧은 추가 정보가 붙는 경우
-        if any(message_clean.startswith(starter) for starter in positive_starters):
-            # "네", "네 좋아요" 같은 경우는 True
-            # "네, 내일 12시요" 같은 경우도 True
-            # 하지만 "네, 그런데 다른 증상은 없어요" 같은 긴 문장은 제외 (5단어 이상)
-            if len(message_clean.split()) < 5:
-                return True
-
-        # 위 조건에 모두 해당하지 않으면 예약 요청이 아님
-        return False
-    
     def extract_department_from_consultation(self, consultation_text: str) -> Optional[str]:
         """상담 내용에서 진료과 추출"""
         # 의료진 연계 섹션에서 진료과 추출

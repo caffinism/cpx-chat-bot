@@ -84,6 +84,14 @@ extract_client = AOAIClient(
     system_message=extract_prompt
 )
 
+# Intent recognition client:
+intent_prompt = get_prompt("intent_recognition.txt")
+intent_client = AOAIClient(
+    endpoint=os.environ.get("AOAI_ENDPOINT"),
+    deployment=os.environ.get("AOAI_DEPLOYMENT"),
+    system_message=intent_prompt
+)
+
 # PII:
 PII_ENABLED = os.environ.get("PII_ENABLED", "false").lower() == "true"
 print(f"PII_ENABLED: {PII_ENABLED}")
@@ -115,6 +123,30 @@ def fallback_function(
     return rag_client.chat_completion(query, history=history)
 
 
+async def get_intent(message: str, history: list[ChatMessage]) -> str:
+    """Classify user intent using LLM."""
+    try:
+        # Pass conversation history for context
+        history_str = ", ".join(f"{msg.role} - {msg.content}" for msg in history)
+        contextual_message = f"History: [{history_str}]\n\nUser Message: {message}"
+
+        raw_response = intent_client.chat_completion(contextual_message, history=None) # history is already included
+        print(f"Intent raw response: {raw_response}")
+        
+        json_response = json.loads(raw_response)
+        intent = json_response.get("intent", "CONSULTATION") # Default to consultation on error
+        print(f"Detected intent: {intent}")
+        return intent
+    except (json.JSONDecodeError, TypeError) as e:
+        logging.error(f"Error decoding intent JSON: {e}")
+        # If JSON parsing fails, fall back to keyword-based check as a safety net
+        if appointment_orchestrator.is_booking_request(message):
+             return "BOOKING"
+        return "CONSULTATION"
+    except Exception as e:
+        logging.error(f"Error getting intent: {e}")
+        return "CONSULTATION" # Default to consultation on any other error
+
 # Enhanced function for medical consultation with appointment booking
 async def orchestrate_chat(
     message: str,
@@ -144,53 +176,51 @@ async def orchestrate_chat(
             )
 
         try:
-            # Re-order logic to handle booking state first
-            booking_info = appointment_orchestrator.appointment_service.get_booking_info(str(chat_id))
+            # Determine intent first
+            intent = await get_intent(message, history)
 
-            # STATE 1: We are already in a booking process.
-            if booking_info:
-                print(f"Continuing booking process for message: {message}")
-                response, booking_complete = appointment_orchestrator.process_booking_message(str(chat_id), message)
-                responses.append(response)
-                need_more_info = not booking_complete
-
-            # STATE 2: This message is a request to START booking.
-            elif appointment_orchestrator.is_booking_request(message):
-                print(f"Booking request detected: {message}")
-                # Check if we have consultation history to start booking
-                consultation_text = _extract_consultation_from_history(history)
+            # STATE 1: User wants to book or is in a booking process
+            if intent == "BOOKING":
+                booking_info = appointment_orchestrator.appointment_service.get_booking_info(str(chat_id))
                 
-                # If no consultation text found, check if the last assistant message was a booking offer
-                if not consultation_text:
-                    last_assistant_msg = _get_last_assistant_message(history)
-                    # Check for "예약" and a question phrase to make the detection more robust
-                    is_booking_offer = (
-                        last_assistant_msg and
-                        "예약" in last_assistant_msg and
-                        any(q in last_assistant_msg for q in ["드릴까요", "원하시나요", "하시겠어요", "도와드릴까요"])
-                    )
-                    if is_booking_offer:
-                        # Extract department from the booking offer message
-                        consultation_text = _extract_consultation_from_booking_offer(last_assistant_msg)
-                
-                if consultation_text:
-                    response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), consultation_text, message)
+                # If already in booking process, continue
+                if booking_info:
+                    print(f"Continuing booking process for message: {message}")
+                    response, booking_complete = appointment_orchestrator.process_booking_message(str(chat_id), message)
                     responses.append(response)
                     need_more_info = not booking_complete
+                # If starting a new booking process
                 else:
-                    responses.append("의료 상담을 먼저 완료해주세요.")
-            
-            # STATE 3: Regular medical consultation
-            else:
-                # Regular medical consultation
-                print(f"Direct RAG mode: processing medical consultation for: {message}")
+                    print(f"Booking request detected: {message}")
+                    consultation_text = _extract_consultation_from_history(history)
+                    
+                    if not consultation_text:
+                        last_assistant_msg = _get_last_assistant_message(history)
+                        is_booking_offer = (
+                            last_assistant_msg and
+                            "예약" in last_assistant_msg and
+                            any(q in last_assistant_msg for q in ["드릴까요", "원하시나요", "하시겠어요", "도와드릴까요"])
+                        )
+                        if is_booking_offer:
+                            consultation_text = _extract_consultation_from_booking_offer(last_assistant_msg)
+                    
+                    if consultation_text:
+                        response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), consultation_text, message)
+                        responses.append(response)
+                        need_more_info = not booking_complete
+                    else:
+                        responses.append("의료 상담을 먼저 완료해주세요. 예약하시려면 상담을 마친 후 다시 요청해주세요.")
+
+            # STATE 2: User wants medical consultation
+            else: # intent == "CONSULTATION"
+                print(f"Consultation intent detected: processing medical consultation for: {message}")
                 response = fallback_function(
-                    message,  # Use original Korean message directly
-                    "ko",     # Korean language
+                    message,
+                    "ko",
                     chat_id,
                     history
                 )
-                need_more_info = True  # Always allow follow-up questions for medical consultation
+                need_more_info = True
                 responses.append(response)
 
         except Exception as e:
