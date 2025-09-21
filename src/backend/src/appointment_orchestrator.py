@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, Optional
 from aoai_client import AOAIClient, get_prompt
-from services.appointment_service import appointment_service
+from services.appointment_service import AppointmentService
 from models.appointment import BookingInfo
 
 class AppointmentOrchestrator:
@@ -10,6 +10,7 @@ class AppointmentOrchestrator:
     def __init__(self, aoai_client: AOAIClient):
         self.aoai_client = aoai_client
         self.booking_prompt = get_prompt("appointment_booking.txt")
+        self.appointment_service = AppointmentService()
     
     def is_booking_request(self, message: str) -> bool:
         """예약 요청인지 확인"""
@@ -97,7 +98,7 @@ class AppointmentOrchestrator:
         department = self.extract_department_from_consultation(consultation_text)
         
         # 예약 세션 시작
-        appointment_service.start_booking_session(
+        self.appointment_service.start_booking_session(
             chat_id=chat_id,
             department=department,
             consultation_summary=consultation_text
@@ -113,7 +114,7 @@ class AppointmentOrchestrator:
     
     def process_booking_message(self, chat_id: str, message: str) -> Tuple[str, bool]:
         """예약 관련 메시지 처리"""
-        booking_info = appointment_service.get_booking_info(chat_id)
+        booking_info = self.appointment_service.get_booking_info(chat_id)
         if not booking_info:
             return "예약 세션을 찾을 수 없습니다. 다시 시작해주세요.", False
         
@@ -122,8 +123,8 @@ class AppointmentOrchestrator:
         
         # 추출된 정보 업데이트
         if extracted_info:
-            appointment_service.update_booking_info(chat_id, **extracted_info)
-            booking_info = appointment_service.get_booking_info(chat_id)
+            self.appointment_service.update_booking_info(chat_id, **extracted_info)
+            booking_info = self.appointment_service.get_booking_info(chat_id)
         
         # 예약 프롬프트로 응답 생성
         prompt = self.booking_prompt.format(
@@ -136,7 +137,7 @@ class AppointmentOrchestrator:
         # 예약 완료 확인
         if booking_info.is_complete() and self._is_confirmation_request(message):
             try:
-                appointment_response = appointment_service.create_appointment(chat_id)
+                appointment_response = self.appointment_service.create_appointment(chat_id)
                 response += f"\n\n예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
                 return response, True  # 예약 완료
             except Exception as e:
