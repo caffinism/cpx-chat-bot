@@ -115,6 +115,14 @@ const Chat = () => {
                 { role: "System", content: msg }
             ]);
         }
+
+        // 메시지 전송 후 입력창에 자동 포커스
+        setTimeout(() => {
+            const input = document.querySelector('.chat-input');
+            if (input) {
+                input.focus();
+            }
+        }, 100);
     };
 
     return (

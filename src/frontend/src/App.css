@@ -312,15 +312,15 @@ body {
   color: #666;
 }
 
-/* 플로팅 챗봇 버튼 - 예쁘게 */
+/* 플로팅 챗봇 버튼 - 예약조회 색상으로 통일 */
 .floating-chat-button {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  border: none;
+  background: #008080;
+  border: 1px outset #008080;
   border-radius: 50%;
   color: white;
   font-size: 28px;
@@ -335,7 +335,7 @@ body {
 }
 
 .floating-chat-button:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
+  background: #006666;
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
@@ -345,12 +345,13 @@ body {
 }
 
 .floating-chat-button.chat-open {
-  background: linear-gradient(135deg, #f44336, #d32f2f);
+  background: #f44336;
+  border-color: #f44336;
   transform: scale(1.05);
 }
 
 .floating-chat-button.chat-open:hover {
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: #d32f2f;
   transform: scale(1.15);
 }
 
@@ -544,6 +545,172 @@ body {
   background: #999;
   color: #666;
   cursor: not-allowed;
+}
+
+/* 예약 조회 스타일 */
+.appointment-lookup {
+  background: #ffffff;
+  border: 1px solid #999;
+  margin: 20px 0;
+}
+
+.lookup-container {
+  padding: 30px;
+}
+
+.lookup-container h2 {
+  font-size: 28px;
+  color: #000;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+}
+
+.lookup-description {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.lookup-form {
+  margin-bottom: 25px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.appointment-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #999;
+  font-size: 18px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.appointment-input:focus {
+  outline: none;
+  border-color: #008080;
+  box-shadow: 0 0 5px rgba(0, 128, 128, 0.3);
+}
+
+.lookup-button {
+  background: #008080;
+  color: white;
+  border: 1px outset #008080;
+  padding: 12px 25px;
+  font-size: 18px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.lookup-button:hover {
+  background: #006666;
+}
+
+.lookup-button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 15px;
+  border: 1px solid #ffcdd2;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.appointment-details {
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.appointment-details h3 {
+  font-size: 24px;
+  color: #000;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #999;
+  padding-bottom: 8px;
+}
+
+.appointment-info {
+  margin-bottom: 25px;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.info-row .label {
+  font-weight: bold;
+  color: #000;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.info-row .value {
+  color: #333;
+  flex: 1;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.status.confirmed {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status.pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.status.cancelled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.appointment-actions {
+  text-align: center;
+}
+
+.action-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px outset #c0c0c0;
+  margin: 0 10px;
+}
+
+.cancel-button {
+  background: #ff5722;
+  color: white;
+  border-color: #ff5722;
+}
+
+.cancel-button:hover {
+  background: #d84315;
 }
 
 /* 반응형 - 모바일 */

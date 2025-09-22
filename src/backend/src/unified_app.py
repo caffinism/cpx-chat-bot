@@ -13,6 +13,7 @@ from aoai_client import AOAIClient, get_prompt
 from router.router_type import RouterType
 from unified_conversation_orchestrator import UnifiedConversationOrchestrator
 from utils import get_azure_credential
+from services.appointment_service import appointment_service
 
 
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "dist"))
@@ -170,3 +171,42 @@ async def chat(request: Request):
     return JSONResponse({
         "messages": responses
     })
+
+
+@app.get("/appointments/{appointment_id}")
+async def get_appointment(appointment_id: str):
+    """예약 조회 API"""
+    appointment = appointment_service.get_appointment(appointment_id)
+    if appointment:
+        return {
+            "appointment_id": appointment.appointment_id,
+            "patient_name": appointment.patient_name,
+            "department": appointment.department,
+            "appointment_date": appointment.preferred_date,
+            "appointment_time": appointment.preferred_time,
+            "status": appointment.status.value,
+            "created_at": appointment.created_at.isoformat()
+        }
+    else:
+        return JSONResponse(
+            status_code=404,
+            content={"error": "예약을 찾을 수 없습니다."}
+        )
+
+
+@app.get("/appointments")
+async def list_appointments():
+    """전체 예약 목록 조회 API"""
+    appointments = []
+    for apt in appointment_service.appointments:
+        appointments.append({
+            "appointment_id": apt.appointment_id,
+            "patient_name": apt.patient_name,
+            "department": apt.department,
+            "appointment_date": apt.preferred_date,
+            "appointment_time": apt.preferred_time,
+            "status": apt.status.value,
+            "created_at": apt.created_at.isoformat()
+        })
+    
+    return {"appointments": appointments}
