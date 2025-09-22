@@ -114,8 +114,22 @@ class AppointmentOrchestrator:
             raw_response = self.aoai_client.chat_completion(prompt)
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
             
+            # JSON 파싱 전에 응답 정리
+            response_clean = raw_response.strip()
+            # JSON 부분만 추출 (```json ... ``` 형태일 수 있음)
+            if "```json" in response_clean:
+                json_start = response_clean.find("```json") + 7
+                json_end = response_clean.find("```", json_start)
+                if json_end != -1:
+                    response_clean = response_clean[json_start:json_end].strip()
+            elif "```" in response_clean:
+                json_start = response_clean.find("```") + 3
+                json_end = response_clean.find("```", json_start)
+                if json_end != -1:
+                    response_clean = response_clean[json_start:json_end].strip()
+            
             # JSON 파싱
-            extraction_result = json.loads(raw_response)
+            extraction_result = json.loads(response_clean)
             return extraction_result
             
         except (json.JSONDecodeError, TypeError) as e:

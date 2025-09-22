@@ -255,7 +255,9 @@ def _extract_consultation_from_history(history: list[ChatMessage]) -> str:
             elif "예약을 잡아드릴까요" in msg.content:
                 consultation_parts.append(msg.content)
     
-    return "\n".join(consultation_parts) if consultation_parts else ""
+    result = "\n".join(consultation_parts) if consultation_parts else ""
+    print(f"[DEBUG] Extracted consultation from history: {result}")
+    return result
 
 def _get_last_assistant_message(history: list[ChatMessage]) -> str:
     """마지막 어시스턴트 메시지 반환"""
