@@ -118,7 +118,18 @@ class AppointmentOrchestrator:
         print(f"[DEBUG] Missing fields: {missing_labels}")
         print(f"[DEBUG] Missing fields string: {missing_fields_str}")
 
-        # 예약 프롬프트로 응답 생성
+        # 예약 완료 확인 (정보가 완전하고 확인 의도가 있으면 예약 완료)
+        is_confirmation = extraction_result and extraction_result.get("confirmation_intent", False)
+        if booking_info.is_complete() and is_confirmation:
+            try:
+                appointment_response = self.appointment_service.create_appointment(chat_id)
+                response = f"예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
+                return response, True  # 예약 완료
+            except Exception as e:
+                response = f"예약 처리 중 오류가 발생했습니다: {str(e)}"
+                return response, False
+        
+        # 예약 프롬프트로 응답 생성 (정보가 부족한 경우만)
         prompt = self.booking_prompt.format(
             department=booking_info.department,
             consultation_summary=booking_info.consultation_summary,
@@ -128,17 +139,6 @@ class AppointmentOrchestrator:
         )
         
         response = self.aoai_client.chat_completion(prompt)
-        
-        # 예약 완료 확인 (LLM 추출 결과의 confirmation_intent 사용)
-        is_confirmation = extraction_result and extraction_result.get("confirmation_intent", False)
-        if booking_info.is_complete() and is_confirmation:
-            try:
-                appointment_response = self.appointment_service.create_appointment(chat_id)
-                response += f"\n\n예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
-                return response, True  # 예약 완료
-            except Exception as e:
-                response += f"\n\n예약 처리 중 오류가 발생했습니다: {str(e)}"
-        
         return response, False
     
     def _extract_booking_info_with_llm(self, message: str) -> dict:
