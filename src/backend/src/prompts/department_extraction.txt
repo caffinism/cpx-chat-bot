@@ -12,6 +12,7 @@ Format: [Department Name]
 
 ## Extraction Rules
 - Look for patterns like "XX과에 예약을 잡아드릴까요?" or "XX과 방문이 필요합니다"
+- Also look for markdown bold patterns like "**XX과에 예약을 잡아드릴까요?**"
 - Extract the department name before "과" (e.g., "소화기내과", "내분비내과", "정신과")
 - If multiple departments are mentioned, choose the one that was recommended for booking
 - If no department is found, respond with "내과"
@@ -26,6 +27,9 @@ Consultation: "4) 의료진 연계: 내분비내과 진료를 권장합니다. .
 Response: 내분비내과
 
 Consultation: "4) 의료진 연계: 정신과 방문이 필요합니다. ... 정신과에 예약을 잡아드릴까요?"
+Response: 정신과
+
+Consultation: "**정신과에 예약을 잡아드릴까요?**"
 Response: 정신과
 
 Consultation: "일반적인 감기 증상입니다. 휴식을 취하시면 됩니다."

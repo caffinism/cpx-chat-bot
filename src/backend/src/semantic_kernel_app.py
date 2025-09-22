@@ -251,7 +251,7 @@ def _extract_consultation_from_history(history: list[ChatMessage]) -> str:
             # 구조화된 상담 내용 찾기
             if any(keyword in msg.content for keyword in ["추정진단", "권장 검사", "치료 및 처치", "의료진 연계", "환자교육", "예후"]):
                 consultation_parts.append(msg.content)
-            # 예약 제안 메시지도 상담 내용으로 간주
+            # 예약 제안 메시지도 상담 내용으로 간주 (마크다운 볼드 처리 고려)
             elif "예약을 잡아드릴까요" in msg.content:
                 consultation_parts.append(msg.content)
     

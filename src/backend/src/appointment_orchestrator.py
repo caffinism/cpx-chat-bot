@@ -116,6 +116,8 @@ class AppointmentOrchestrator:
             
             # JSON 파싱 전에 응답 정리
             response_clean = raw_response.strip()
+            print(f"[DEBUG] Raw response before cleaning: {repr(response_clean)}")
+            
             # JSON 부분만 추출 (```json ... ``` 형태일 수 있음)
             if "```json" in response_clean:
                 json_start = response_clean.find("```json") + 7
@@ -127,6 +129,8 @@ class AppointmentOrchestrator:
                 json_end = response_clean.find("```", json_start)
                 if json_end != -1:
                     response_clean = response_clean[json_start:json_end].strip()
+            
+            print(f"[DEBUG] Cleaned response: {repr(response_clean)}")
             
             # JSON 파싱
             extraction_result = json.loads(response_clean)
