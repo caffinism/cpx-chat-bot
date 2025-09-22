@@ -2,7 +2,7 @@ import re
 import json
 from typing import Tuple, Optional
 from aoai_client import AOAIClient, get_prompt
-from services.appointment_service import AppointmentService
+from services.appointment_service import appointment_service
 from models.appointment import BookingInfo
 
 class AppointmentOrchestrator:
@@ -13,7 +13,7 @@ class AppointmentOrchestrator:
         self.booking_prompt = get_prompt("appointment_booking.txt")
         self.booking_extraction_prompt = get_prompt("booking_info_extraction.txt")
         self.department_extraction_prompt = get_prompt("department_extraction.txt")
-        self.appointment_service = AppointmentService()
+        self.appointment_service = appointment_service
     
     def extract_department_from_consultation(self, consultation_text: str) -> Optional[str]:
         """상담 내용에서 진료과 추출 (LLM 기반)"""

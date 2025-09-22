@@ -10,6 +10,9 @@ class AppointmentService:
         # 실제 운영에서는 데이터베이스 사용
         self.appointments: List[AppointmentRequest] = []
         self.booking_sessions: dict = {}  # chat_id -> BookingInfo
+        
+        # 샘플 예약 추가
+        self._add_sample_appointment()
     
     def start_booking_session(self, chat_id: str, department: str, consultation_summary: str) -> None:
         """예약 세션 시작"""
@@ -112,6 +115,20 @@ class AppointmentService:
         
         for chat_id in expired_sessions:
             del self.booking_sessions[chat_id]
+    
+    def _add_sample_appointment(self) -> None:
+        """샘플 예약 추가"""
+        sample_appointment = AppointmentRequest(
+            appointment_id="SAMPLE001",
+            patient_name="홍길동",
+            phone_number="010-1234-1234",
+            preferred_date="12월 12일",
+            preferred_time="15:00",
+            department="외과",
+            consultation_summary="샘플 예약입니다.",
+            status=AppointmentStatus.CONFIRMED
+        )
+        self.appointments.append(sample_appointment)
 
 # 전역 서비스 인스턴스
 appointment_service = AppointmentService()
