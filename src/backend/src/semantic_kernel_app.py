@@ -375,3 +375,86 @@ async def cancel_appointment(appointment_id: str):
             content={"error": "An unexpected error occurred"},
             status_code=500
         )
+
+
+@app.get("/health")
+async def health_check():
+    """서버 상태 확인"""
+    return {"status": "ok", "message": "Server is running"}
+
+
+@app.get("/routes")
+async def list_routes():
+    """등록된 라우트 목록 확인"""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, 'methods') and hasattr(route, 'path'):
+            routes.append({
+                "path": route.path,
+                "methods": list(route.methods)
+            })
+    return {"routes": routes}
+
+
+@app.get("/appointments")
+async def list_appointments():
+    """전체 예약 목록 조회 API"""
+    appointments = []
+    for apt in appointment_orchestrator.appointment_service.appointments:
+        appointments.append({
+            "appointment_id": apt.appointment_id,
+            "patient_name": apt.patient_name,
+            "department": apt.department,
+            "appointment_date": apt.preferred_date,
+            "appointment_time": apt.preferred_time,
+            "status": apt.status.value,
+            "created_at": apt.created_at.isoformat()
+        })
+    
+    return {"appointments": appointments}
+
+
+@app.get("/appointments/{appointment_id}")
+async def get_appointment_by_id(appointment_id: str):
+    """예약 조회 API (복수형 경로)"""
+    try:
+        appointment = appointment_orchestrator.appointment_service.get_appointment(appointment_id)
+        if not appointment:
+            return JSONResponse(
+                content={"error": "예약을 찾을 수 없습니다."},
+                status_code=404
+            )
+        
+        return {
+            "appointment_id": appointment.appointment_id,
+            "patient_name": appointment.patient_name,
+            "department": appointment.department,
+            "appointment_date": appointment.preferred_date,
+            "appointment_time": appointment.preferred_time,
+            "status": appointment.status.value,
+            "created_at": appointment.created_at.isoformat()
+        }
+    
+    except Exception as e:
+        logging.error(f"Error in appointment lookup: {e}")
+        return JSONResponse(
+            content={"error": "An unexpected error occurred"},
+            status_code=500
+        )
+
+
+@app.get("/debug/appointments")
+async def debug_appointments():
+    """디버그: 현재 예약 목록 확인"""
+    return {
+        "total_appointments": len(appointment_orchestrator.appointment_service.appointments),
+        "appointment_ids": [apt.appointment_id for apt in appointment_orchestrator.appointment_service.appointments],
+        "appointments": [
+            {
+                "appointment_id": apt.appointment_id,
+                "patient_name": apt.patient_name,
+                "department": apt.department
+            }
+            for apt in appointment_orchestrator.appointment_service.appointments
+        ]
+    }
