@@ -84,11 +84,24 @@ class AppointmentOrchestrator:
         # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
         collected_info_str = booking_info.to_summary_string()
 
+        # 누락된 필드 계산
+        missing_labels: list[str] = []
+        if not booking_info.patient_name:
+            missing_labels.append("성함")
+        if not booking_info.phone_number:
+            missing_labels.append("연락처")
+        if not booking_info.preferred_date:
+            missing_labels.append("희망 날짜")
+        if not booking_info.preferred_time:
+            missing_labels.append("희망 시간")
+        missing_fields_str = ", ".join(missing_labels) if missing_labels else "없음"
+
         # 예약 프롬프트로 응답 생성
         prompt = self.booking_prompt.format(
             department=booking_info.department,
             consultation_summary=booking_info.consultation_summary,
             collected_info=collected_info_str,
+            missing_fields=missing_fields_str,
             query=message
         )
         
