@@ -177,7 +177,8 @@ class AOAIClient(AzureOpenAI):
         id: str = None,
         history: list = None,
         use_rag: bool | None = None,
-        function_calling: bool | None = None
+        function_calling: bool | None = None,
+        response_format: dict | None = None
     ) -> str:
         """
         AOAI chat completion with conversation history.
@@ -224,14 +225,31 @@ class AOAIClient(AzureOpenAI):
 
         # Call chat API with full conversation context:
         try:
-            response = self.chat.completions.create(
-                model=self.deployment,
-                messages=messages
-            )
+            kwargs = {"model": self.deployment, "messages": messages}
+            if response_format is not None:
+                kwargs["response_format"] = response_format
+
+            try:
+                self.logger.info(f"Attempting chat completion with kwargs: {kwargs}")
+                response = self.chat.completions.create(**kwargs)
+            except Exception as e:
+                self.logger.warning(
+                    f"Initial chat completion call failed with error: {e}. "
+                    "Retrying without response_format if it was used."
+                )
+                if "response_format" in kwargs:
+                    kwargs.pop("response_format")
+                    self.logger.info(f"Retrying chat completion with kwargs: {kwargs}")
+                    response = self.chat.completions.create(**kwargs)
+                else:
+                    # If response_format wasn't the issue, re-raise the original error
+                    raise
+
             response_message = response.choices[0].message
             self.logger.info(f"Model response: {response_message}")
             return response_message.content
         except Exception as e:
             # Log minimal context to help debug upstream callers
-            self.logger.error(f"chat_completion failed: {e}")
+            snippet = message[:400] if isinstance(message, str) else str(message)[:400]
+            self.logger.error(f"chat_completion failed definitively: {e} | prompt_snippet={snippet}")
             raise

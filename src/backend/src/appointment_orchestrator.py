@@ -132,7 +132,12 @@ class AppointmentOrchestrator:
         try:
             # LLM에 정보 추출 요청
             prompt = self.booking_extraction_prompt.format(query=message)
-            raw_response = self.aoai_client.chat_completion(prompt, use_rag=False, function_calling=False)
+            raw_response = self.aoai_client.chat_completion(
+                prompt,
+                use_rag=False,
+                function_calling=False,
+                response_format={"type": "json_object"}
+            )
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
             print(f"[DEBUG] Raw response length: {len(raw_response)}")
             print(f"[DEBUG] Raw response type: {type(raw_response)}")
@@ -206,18 +211,24 @@ class AppointmentOrchestrator:
         
         # 전화번호 추출
         phone_patterns = [
-            r"(\d{3}-\d{4}-\d{4})",
-            r"(\d{3}\s*\d{4}\s*\d{4})",
-            r"(\d{11})"
+            r"(\d{3}-\d{4}-\d{4})",           # 010-1234-5678
+            r"(\d{3}\s*\d{4}\s*\d{4})",     # 010 1234 5678 / 01012345678
+            r"(\d{3}-\d{8})",                  # 010-12345678 (normalize to 010-1234-5678)
+            r"(\d{11})"                          # 11 digits contiguous
         ]
         
         for pattern in phone_patterns:
             match = re.search(pattern, message)
             if match:
-                phone = match.group(1).replace(" ", "-")
-                if len(phone) == 11 and not "-" in phone:
-                    phone = f"{phone[:3]}-{phone[3:7]}-{phone[7:]}"
-                extracted["phone_number"] = phone
+                token = match.group(1)
+                # Remove non-digits then format if 11 digits
+                digits = re.sub(r"\D", "", token)
+                if len(digits) == 11:
+                    phone = f"{digits[:3]}-{digits[3:7]}-{digits[7:]}"
+                    extracted["phone_number"] = phone
+                    break
+                # Fallback: keep token as-is
+                extracted["phone_number"] = token
                 break
         
         # 날짜 추출
@@ -254,6 +265,7 @@ class AppointmentOrchestrator:
             r"(오후\s*\d{1,2}\s*시)",
             r"(\d{1,2}\s*시)",
             r"(\d{1,2}:\d{2})",
+            r"((?:오전|오후)?\s*(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시)",
             r"오전",
             r"오후",
             r"아침",
@@ -264,7 +276,7 @@ class AppointmentOrchestrator:
         for pattern in time_patterns:
             match = re.search(pattern, message)
             if match:
-                if "오전" in message or "아침" in message:
+                if re.search(r"오전|아침", message):
                     # 오전 N시 → 09/10 등으로 보정
                     m = re.search(r"오전\s*(\d{1,2})\s*시", message)
                     if m:
@@ -272,7 +284,7 @@ class AppointmentOrchestrator:
                         extracted["preferred_time"] = f"{hour:02d}:00"
                     else:
                         extracted["preferred_time"] = "09:00"
-                elif "오후" in message:
+                elif re.search(r"오후", message):
                     m = re.search(r"오후\s*(\d{1,2})\s*시", message)
                     if m:
                         hour = int(m.group(1))
@@ -294,7 +306,14 @@ class AppointmentOrchestrator:
                             hour = int(m.group(1))
                             extracted["preferred_time"] = f"{hour:02d}:00"
                         else:
-                            extracted["preferred_time"] = time_str
+                            # 한/두/세... 시 처리
+                            num_map = {"한":1, "두":2, "셋":3, "세":3, "넷":4, "다섯":5, "여섯":6, "일곱":7, "여덟":8, "아홉":9, "열":10}
+                            m2 = re.search(r"(한|두|셋|세|넷|다섯|여섯|일곱|여덟|아홉|열)\s*시", time_str)
+                            if m2:
+                                hour = num_map[m2.group(1)]
+                                extracted["preferred_time"] = f"{hour:02d}:00"
+                            else:
+                                extracted["preferred_time"] = time_str
                     else:
                         extracted["preferred_time"] = time_str
                 break
