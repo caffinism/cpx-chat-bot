@@ -26,6 +26,7 @@ class BookingInfo(BaseModel):
     preferred_time: Optional[str] = None
     department: Optional[str] = None
     consultation_summary: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
     
     def is_complete(self) -> bool:
         """모든 필수 정보가 수집되었는지 확인"""

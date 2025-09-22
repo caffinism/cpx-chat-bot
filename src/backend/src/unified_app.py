@@ -160,6 +160,25 @@ async def home_page():
         return f.read()
 
 
+@app.get("/health")
+async def health_check():
+    """서버 상태 확인"""
+    return {"status": "ok", "message": "Server is running"}
+
+
+@app.get("/routes")
+async def list_routes():
+    """등록된 라우트 목록 확인"""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, 'methods') and hasattr(route, 'path'):
+            routes.append({
+                "path": route.path,
+                "methods": list(route.methods)
+            })
+    return {"routes": routes}
+
+
 @app.post("/chat")
 async def chat(request: Request):
     content = await request.json()
@@ -210,3 +229,20 @@ async def list_appointments():
         })
     
     return {"appointments": appointments}
+
+
+@app.get("/debug/appointments")
+async def debug_appointments():
+    """디버그: 현재 예약 목록 확인"""
+    return {
+        "total_appointments": len(appointment_service.appointments),
+        "appointment_ids": [apt.appointment_id for apt in appointment_service.appointments],
+        "appointments": [
+            {
+                "appointment_id": apt.appointment_id,
+                "patient_name": apt.patient_name,
+                "department": apt.department
+            }
+            for apt in appointment_service.appointments
+        ]
+    }
