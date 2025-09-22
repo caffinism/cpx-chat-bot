@@ -58,16 +58,16 @@ Assistant: 네, {department} 예약 도와드리겠습니다!
 4) 의료진 연계: {department} 진료를 권장합니다.
 ---
 [Collected Information]
-  - 이름: {patient_name}
-  - 희망 날짜: {preferred_date}
-  - 희망 시간: {preferred_time}
+  - 이름: {{patient_name}}
+  - 희망 날짜: {{preferred_date}}
+  - 희망 시간: {{preferred_time}}
 ---
-User: {phone_number} 입니다.
+User: {{phone_number}} 입니다.
 Assistant: 예약 정보를 확인하겠습니다.
-- 성함: {patient_name}
-- 연락처: {phone_number}
+- 성함: {{patient_name}}
+- 연락처: {{phone_number}}
 - 진료과: {department}
-- 희망 일시: {preferred_date} {preferred_time}
+- 희망 일시: {{preferred_date}} {{preferred_time}}
 이 내용이 맞으신가요?
 ---
 

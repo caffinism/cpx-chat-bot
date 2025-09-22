@@ -113,6 +113,8 @@ class AppointmentOrchestrator:
             prompt = self.booking_extraction_prompt.format(query=message)
             raw_response = self.aoai_client.chat_completion(prompt)
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
+            print(f"[DEBUG] Raw response length: {len(raw_response)}")
+            print(f"[DEBUG] Raw response type: {type(raw_response)}")
             
             # JSON 파싱 전에 응답 정리
             response_clean = raw_response.strip()
@@ -120,24 +122,41 @@ class AppointmentOrchestrator:
             
             # JSON 부분만 추출 (```json ... ``` 형태일 수 있음)
             if "```json" in response_clean:
+                print("[DEBUG] Found ```json markers, extracting JSON part")
                 json_start = response_clean.find("```json") + 7
                 json_end = response_clean.find("```", json_start)
                 if json_end != -1:
                     response_clean = response_clean[json_start:json_end].strip()
+                    print(f"[DEBUG] Extracted from ```json: {repr(response_clean)}")
             elif "```" in response_clean:
+                print("[DEBUG] Found ``` markers, extracting JSON part")
                 json_start = response_clean.find("```") + 3
                 json_end = response_clean.find("```", json_start)
                 if json_end != -1:
                     response_clean = response_clean[json_start:json_end].strip()
+                    print(f"[DEBUG] Extracted from ```: {repr(response_clean)}")
+            else:
+                print("[DEBUG] No markdown markers found, using raw response")
+            
+            # JSON이 완전하지 않은 경우 기본값 반환
+            if not response_clean.startswith('{') or not response_clean.endswith('}'):
+                print(f"[WARNING] Incomplete JSON response:")
+                print(f"[WARNING] - Starts with '{{': {response_clean.startswith('{')}")
+                print(f"[WARNING] - Ends with '}}': {response_clean.endswith('}')}")
+                print(f"[WARNING] - Response: {repr(response_clean)}")
+                return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
             
             print(f"[DEBUG] Cleaned response: {repr(response_clean)}")
+            print(f"[DEBUG] JSON validation: {json.loads(response_clean) is not None}")
             
             # JSON 파싱
             extraction_result = json.loads(response_clean)
+            print(f"[DEBUG] Successfully parsed JSON: {extraction_result}")
             return extraction_result
             
         except (json.JSONDecodeError, TypeError) as e:
             print(f"[ERROR] Failed to parse LLM extraction result: {e}")
+            print(f"[ERROR] Raw response that failed: {repr(raw_response)}")
             return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
         except Exception as e:
             print(f"[ERROR] LLM extraction failed: {e}")

@@ -192,28 +192,14 @@ async def orchestrate_chat(
                 # If starting a new booking process
                 else:
                     print(f"Booking request detected: {message}")
-                    consultation_text = _extract_consultation_from_history(history)
-                    last_assistant_msg = _get_last_assistant_message(history)
-
-                    # If no specific consultation text is found, but the last message was from the assistant,
-                    # we can infer that the user is responding to a prompt (most likely a booking offer).
-                    if not consultation_text and last_assistant_msg:
-                        print("Consultation text not found, but last message was from assistant. Assuming booking context.")
-                        # The last assistant message itself is the best available summary.
-                        consultation_text = last_assistant_msg
                     
-                    if consultation_text:
-                        response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), consultation_text, message)
-                        responses.append(response)
-                        need_more_info = not booking_complete
-                    else:
-                        # This case now only happens if a user starts the conversation with a booking request.
-                        # Treat it as a direct booking.
-                        print("Direct booking request inferred on the first turn.")
-                        consultation_text = f"사용자가 직접 예약을 요청했습니다: '{message}'"
-                        response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), consultation_text, message)
-                        responses.append(response)
-                        need_more_info = not booking_complete
+                    # 대화 이력을 그대로 전달하여 진료과 추출
+                    history_text = "\n".join([f"{msg.role}: {msg.content}" for msg in history])
+                    print(f"[DEBUG] Using full conversation history for department extraction: {history_text}")
+                    
+                    response, booking_complete = appointment_orchestrator.handle_booking_request(str(chat_id), history_text, message)
+                    responses.append(response)
+                    need_more_info = not booking_complete
 
             # STATE 2: User wants medical consultation
             else: # intent == "CONSULTATION"
