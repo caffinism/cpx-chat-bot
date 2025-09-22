@@ -102,6 +102,7 @@ class AppointmentOrchestrator:
         
         # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
         collected_info_str = booking_info.to_summary_string()
+        print(f"[DEBUG] collected_info_str: {repr(collected_info_str)}")
 
         # 누락된 필드 계산
         missing_labels: list[str] = []
@@ -133,6 +134,7 @@ class AppointmentOrchestrator:
             else:
                 # 정보가 완전하지만 확인 의도가 없으면 확인 요청
                 response = f"예약 정보를 확인해주세요:\n{collected_info_str}\n\n이 내용으로 예약을 진행하시겠습니까?"
+                print(f"[DEBUG] Confirmation request response: {response}")
                 return response, False  # 확인 대기
         
         # 예약 프롬프트로 응답 생성 (정보가 부족한 경우만)
