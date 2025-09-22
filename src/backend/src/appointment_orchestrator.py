@@ -10,14 +10,19 @@ class AppointmentOrchestrator:
     def __init__(self, aoai_client: AOAIClient):
         self.aoai_client = aoai_client
         self.booking_prompt = get_prompt("appointment_booking.txt")
+        self.booking_extraction_prompt = get_prompt("booking_info_extraction.txt")
         self.appointment_service = AppointmentService()
     
     def extract_department_from_consultation(self, consultation_text: str) -> Optional[str]:
         """상담 내용에서 진료과 추출 (강화된 로직)"""
+        print(f"[DEBUG] Extracting department from: {consultation_text}")
+        
         # 1. "XX과에 예약을 잡아드릴까요?" 패턴에서 직접 추출 (가장 정확)
         offer_match = re.search(r"([가-힣]+과)에 예약을 잡아드릴까요\?", consultation_text)
         if offer_match:
-            return offer_match.group(1).strip()
+            dept = offer_match.group(1).strip()
+            print(f"[DEBUG] Found department from offer pattern: {dept}")
+            return dept
 
         # 2. "의료진 연계" 섹션에서 추출
         department_patterns = [
@@ -27,16 +32,30 @@ class AppointmentOrchestrator:
             match = re.search(pattern, consultation_text)
             if match:
                 department_text = match.group(1)
+                print(f"[DEBUG] Found department text: {department_text}")
                 # "방문" 등의 단어를 제외하고 진료과만 추출
                 dept_match = re.search(r"([가-힣]+과)", department_text)
                 if dept_match:
-                    return dept_match.group(1).strip()
+                    dept = dept_match.group(1).strip()
+                    print(f"[DEBUG] Extracted department from medical staff section: {dept}")
+                    return dept
         
-        # 3. 일반적인 "XX과" 패턴으로 찾기
-        general_match = re.search(r"([가-힣]+과)", consultation_text)
-        if general_match:
-            return general_match.group(1).strip()
+        # 3. 일반적인 "XX과" 패턴으로 찾기 (더 구체적인 패턴 우선)
+        specific_patterns = [
+            r"([가-힣]+내과)",  # 내분비내과, 소화기내과 등
+            r"([가-힣]+외과)",  # 정형외과, 신경외과 등
+            r"([가-힣]+과)"     # 기타 모든 과
+        ]
+        
+        for pattern in specific_patterns:
+            matches = re.findall(pattern, consultation_text)
+            if matches:
+                # 가장 긴 매치를 선택 (내분비내과 > 내과)
+                dept = max(matches, key=len).strip()
+                print(f"[DEBUG] Found department with pattern {pattern}: {dept}")
+                return dept
 
+        print(f"[DEBUG] No department found, using default: 내과")
         return "내과"  # 모든 패턴 실패 시 기본값
     
     def handle_booking_request(self, chat_id: str, consultation_text: str, message: str) -> Tuple[str, bool]:
@@ -54,19 +73,24 @@ class AppointmentOrchestrator:
         return self.process_booking_message(chat_id, message)
     
     def process_booking_message(self, chat_id: str, message: str) -> Tuple[str, bool]:
-        """예약 관련 메시지 처리"""
+        """예약 관련 메시지 처리 (LLM 기반)"""
         booking_info = self.appointment_service.get_booking_info(chat_id)
         if not booking_info:
             return "예약 세션을 찾을 수 없습니다. 다시 시작해주세요.", False
         
-        # 정보 추출 시도
-        extracted_info = self._extract_booking_info(message)
+        # LLM으로 정보 추출
+        extraction_result = self._extract_booking_info_with_llm(message)
+        print(f"[DEBUG] LLM extraction result: {extraction_result}")
         
         # 추출된 정보 업데이트
-        if extracted_info:
-            self.appointment_service.update_booking_info(chat_id, **extracted_info)
-            # 업데이트된 정보로 다시 로드
-            booking_info = self.appointment_service.get_booking_info(chat_id)
+        if extraction_result and extraction_result.get("extracted"):
+            extracted_info = extraction_result["extracted"]
+            # None이 아닌 값만 업데이트
+            update_data = {k: v for k, v in extracted_info.items() if v is not None}
+            if update_data:
+                self.appointment_service.update_booking_info(chat_id, **update_data)
+                # 업데이트된 정보로 다시 로드
+                booking_info = self.appointment_service.get_booking_info(chat_id)
         
         # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
         collected_info_str = booking_info.to_summary_string()
@@ -81,8 +105,9 @@ class AppointmentOrchestrator:
         
         response = self.aoai_client.chat_completion(prompt)
         
-        # 예약 완료 확인
-        if booking_info.is_complete() and self._is_confirmation_request(message):
+        # 예약 완료 확인 (LLM 추출 결과의 confirmation_intent 사용)
+        is_confirmation = extraction_result and extraction_result.get("confirmation_intent", False)
+        if booking_info.is_complete() and is_confirmation:
             try:
                 appointment_response = self.appointment_service.create_appointment(chat_id)
                 response += f"\n\n예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
@@ -91,6 +116,26 @@ class AppointmentOrchestrator:
                 response += f"\n\n예약 처리 중 오류가 발생했습니다: {str(e)}"
         
         return response, False
+    
+    def _extract_booking_info_with_llm(self, message: str) -> dict:
+        """LLM을 사용한 예약 정보 추출"""
+        try:
+            # LLM에 정보 추출 요청
+            prompt = self.booking_extraction_prompt.format(query=message)
+            raw_response = self.aoai_client.chat_completion(prompt)
+            print(f"[DEBUG] LLM extraction raw response: {raw_response}")
+            
+            # JSON 파싱
+            import json
+            extraction_result = json.loads(raw_response)
+            return extraction_result
+            
+        except (json.JSONDecodeError, TypeError) as e:
+            print(f"[ERROR] Failed to parse LLM extraction result: {e}")
+            return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
+        except Exception as e:
+            print(f"[ERROR] LLM extraction failed: {e}")
+            return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
     
     def _extract_booking_info(self, message: str) -> dict:
         """메시지에서 예약 정보 추출"""
