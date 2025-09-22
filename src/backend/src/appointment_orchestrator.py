@@ -118,16 +118,22 @@ class AppointmentOrchestrator:
         print(f"[DEBUG] Missing fields: {missing_labels}")
         print(f"[DEBUG] Missing fields string: {missing_fields_str}")
 
-        # 예약 완료 확인 (정보가 완전하고 확인 의도가 있으면 예약 완료)
+        # 예약 완료 확인 (정보가 완전하면 예약 완료)
         is_confirmation = extraction_result and extraction_result.get("confirmation_intent", False)
-        if booking_info.is_complete() and is_confirmation:
-            try:
-                appointment_response = self.appointment_service.create_appointment(chat_id)
-                response = f"예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
-                return response, True  # 예약 완료
-            except Exception as e:
-                response = f"예약 처리 중 오류가 발생했습니다: {str(e)}"
-                return response, False
+        if booking_info.is_complete():
+            if is_confirmation:
+                # 확인 의도가 있으면 바로 예약 완료
+                try:
+                    appointment_response = self.appointment_service.create_appointment(chat_id)
+                    response = f"예약이 완료되었습니다!\n예약번호: {appointment_response.appointment_id}\n{appointment_response.appointment_date} {appointment_response.appointment_time}에 {appointment_response.department}로 오시면 됩니다."
+                    return response, True  # 예약 완료
+                except Exception as e:
+                    response = f"예약 처리 중 오류가 발생했습니다: {str(e)}"
+                    return response, False
+            else:
+                # 정보가 완전하지만 확인 의도가 없으면 확인 요청
+                response = f"예약 정보를 확인해주세요:\n{collected_info_str}\n\n이 내용으로 예약을 진행하시겠습니까?"
+                return response, False  # 확인 대기
         
         # 예약 프롬프트로 응답 생성 (정보가 부족한 경우만)
         prompt = self.booking_prompt.format(

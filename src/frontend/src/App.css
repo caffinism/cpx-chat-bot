@@ -440,7 +440,7 @@ body {
 
 .message-content {
   background: #ffffff;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 30px; /* 왼쪽 패딩을 30px로 더 증가 */
   border: 1px solid #999;
   margin-bottom: 5px;
   overflow-wrap: break-word;
@@ -476,14 +476,15 @@ body {
 
 .message-text ol,
 .message-text ul {
-  padding-left: 25px; /* 숫자 표시를 위한 내부 여백 확보 */
+  padding-left: 30px; /* 숫자 표시를 위한 내부 여백 확보 */
   margin: 10px 0;
 }
 
 .message-text li {
   margin-bottom: 5px;
-  padding-left: 5px; /* 숫자와 텍스트 사이 간격 */
+  padding-left: 8px; /* 숫자와 텍스트 사이 간격 */
 }
+
 
 /* 커서 애니메이션 - 심플하게 */
 .cursor {

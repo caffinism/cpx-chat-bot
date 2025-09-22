@@ -123,7 +123,7 @@ const Chat = () => {
                 {messages.length === 0 && (
                     <div className="message agent">
                         <div className="message-content">
-                            <h3 className="message-header">🩺 의사</h3>
+                            <h3 className="message-header">🩺 AI 의사</h3>
                             <div className="message-text streaming">
                                 <Markdown>{streamedWelcome || ''}</Markdown>
                                 {isWelcomeStreaming && <span className="cursor">|</span>}
@@ -134,7 +134,7 @@ const Chat = () => {
                 {messages.map((message, index) => (
                     <div key={index} tabIndex="0" className={message.role === 'User' ? "message user" : "message agent"}>
                         <div className="message-content">
-                            <h3 className="message-header">{message.role === 'User' ? '👤 환자' : '🩺 의사'}</h3>
+                            <h3 className="message-header">{message.role === 'User' ? '👤 환자' : '🩺 AI 의사'}</h3>
                             <Markdown className="message-text">{message.content}</Markdown>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ const Chat = () => {
                 {isTyping && (
                     <div className="message agent">
                         <div className="message-content">
-                            <h3 className="message-header">🩺 의사</h3>
+                            <h3 className="message-header">🩺 AI 의사</h3>
                             <p className="typing-indicator">
                                 진단 중입니다<span className="dots">...</span>
                             </p>
