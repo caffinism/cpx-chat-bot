@@ -247,8 +247,13 @@ def _extract_consultation_from_history(history: list[ChatMessage]) -> str:
     """대화 히스토리에서 의료 상담 내용 추출"""
     consultation_parts = []
     for msg in history:
-        if msg.role == "assistant" and any(keyword in msg.content for keyword in ["추정진단", "권장 검사", "치료 및 처치", "의료진 연계", "환자교육", "예후"]):
-            consultation_parts.append(msg.content)
+        if msg.role == "assistant":
+            # 구조화된 상담 내용 찾기
+            if any(keyword in msg.content for keyword in ["추정진단", "권장 검사", "치료 및 처치", "의료진 연계", "환자교육", "예후"]):
+                consultation_parts.append(msg.content)
+            # 예약 제안 메시지도 상담 내용으로 간주
+            elif "예약을 잡아드릴까요" in msg.content:
+                consultation_parts.append(msg.content)
     
     return "\n".join(consultation_parts) if consultation_parts else ""
 

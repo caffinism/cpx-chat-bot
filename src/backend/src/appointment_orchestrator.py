@@ -1,4 +1,5 @@
 import re
+import json
 from typing import Tuple, Optional
 from aoai_client import AOAIClient, get_prompt
 from services.appointment_service import AppointmentService
@@ -11,52 +12,40 @@ class AppointmentOrchestrator:
         self.aoai_client = aoai_client
         self.booking_prompt = get_prompt("appointment_booking.txt")
         self.booking_extraction_prompt = get_prompt("booking_info_extraction.txt")
+        self.department_extraction_prompt = get_prompt("department_extraction.txt")
         self.appointment_service = AppointmentService()
     
     def extract_department_from_consultation(self, consultation_text: str) -> Optional[str]:
-        """상담 내용에서 진료과 추출 (강화된 로직)"""
+        """상담 내용에서 진료과 추출 (LLM 기반)"""
         print(f"[DEBUG] Extracting department from: {consultation_text}")
         
-        # 1. "XX과에 예약을 잡아드릴까요?" 패턴에서 직접 추출 (가장 정확)
-        offer_match = re.search(r"([가-힣]+과)에 예약을 잡아드릴까요\?", consultation_text)
-        if offer_match:
-            dept = offer_match.group(1).strip()
-            print(f"[DEBUG] Found department from offer pattern: {dept}")
-            return dept
-
-        # 2. "의료진 연계" 섹션에서 추출
-        department_patterns = [
-            r"의료진 연계[:\s]*([^:\n]+)",
-        ]
-        for pattern in department_patterns:
-            match = re.search(pattern, consultation_text)
-            if match:
-                department_text = match.group(1)
-                print(f"[DEBUG] Found department text: {department_text}")
-                # "방문" 등의 단어를 제외하고 진료과만 추출
-                dept_match = re.search(r"([가-힣]+과)", department_text)
-                if dept_match:
-                    dept = dept_match.group(1).strip()
-                    print(f"[DEBUG] Extracted department from medical staff section: {dept}")
-                    return dept
-        
-        # 3. 일반적인 "XX과" 패턴으로 찾기 (더 구체적인 패턴 우선)
-        specific_patterns = [
-            r"([가-힣]+내과)",  # 내분비내과, 소화기내과 등
-            r"([가-힣]+외과)",  # 정형외과, 신경외과 등
-            r"([가-힣]+과)"     # 기타 모든 과
-        ]
-        
-        for pattern in specific_patterns:
-            matches = re.findall(pattern, consultation_text)
-            if matches:
-                # 가장 긴 매치를 선택 (내분비내과 > 내과)
-                dept = max(matches, key=len).strip()
-                print(f"[DEBUG] Found department with pattern {pattern}: {dept}")
+        try:
+            # LLM에 진료과 추출 요청
+            prompt = self.department_extraction_prompt.format(consultation_text=consultation_text)
+            raw_response = self.aoai_client.chat_completion(prompt)
+            print(f"[DEBUG] LLM department extraction response: {raw_response}")
+            
+            # 응답에서 진료과명 추출 (한글만)
+            response_clean = raw_response.strip()
+            dept_match = re.search(r'([가-힣]+과)', response_clean)
+            if dept_match:
+                dept = dept_match.group(1).strip()
+                print(f"[DEBUG] Extracted department: {dept}")
                 return dept
-
-        print(f"[DEBUG] No department found, using default: 내과")
-        return "내과"  # 모든 패턴 실패 시 기본값
+            else:
+                print(f"[DEBUG] No department found in LLM response: '{response_clean}', using default: 내과")
+                return "내과"
+                
+        except Exception as e:
+            print(f"[ERROR] LLM department extraction failed: {e}")
+            # 폴백: 정규식으로 추출 시도
+            offer_match = re.search(r"([가-힣]+과)에 예약을 잡아드릴까요\?", consultation_text)
+            if offer_match:
+                dept = offer_match.group(1).strip()
+                print(f"[DEBUG] Fallback: Found department from offer pattern: {dept}")
+                return dept
+            print(f"[DEBUG] Fallback: No department found, using default: 내과")
+            return "내과"
     
     def handle_booking_request(self, chat_id: str, consultation_text: str, message: str) -> Tuple[str, bool]:
         """Starts a booking session and processes the first user message."""
@@ -126,7 +115,6 @@ class AppointmentOrchestrator:
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
             
             # JSON 파싱
-            import json
             extraction_result = json.loads(raw_response)
             return extraction_result
             
