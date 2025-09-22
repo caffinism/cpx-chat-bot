@@ -170,6 +170,50 @@ class AOAIClient(AzureOpenAI):
 
         return system_part, user_part
 
+    def _fix_json_response(self, content: str) -> str:
+        """
+        JSON 응답을 수정하여 유효한 JSON 형태로 만듭니다.
+        """
+        if not content:
+            return content
+            
+        content = content.strip()
+        
+        # 이미 완전한 JSON인 경우
+        if content.startswith('{') and content.endswith('}'):
+            return content
+        
+        # 마크다운 코드 블록 제거
+        if "```json" in content:
+            json_start = content.find("```json") + 7
+            json_end = content.find("```", json_start)
+            if json_end != -1:
+                content = content[json_start:json_end].strip()
+        elif "```" in content:
+            json_start = content.find("```") + 3
+            json_end = content.find("```", json_start)
+            if json_end != -1:
+                content = content[json_start:json_end].strip()
+        
+        # "extracted": ... 형태인 경우 중괄호 추가
+        if content.startswith('"extracted"') or content.startswith('extracted'):
+            self.logger.info(f"Fixing JSON response: {content}")
+            if not content.startswith('{'):
+                content = '{' + content
+            if not content.endswith('}'):
+                content = content + '}'
+            self.logger.info(f"Fixed JSON response: {content}")
+        # 다른 JSON-like 내용이 있는 경우
+        elif 'extracted' in content or 'missing' in content or 'confirmation_intent' in content:
+            self.logger.info(f"Fixing JSON-like response: {content}")
+            if not content.startswith('{'):
+                content = '{' + content
+            if not content.endswith('}'):
+                content = content + '}'
+            self.logger.info(f"Fixed JSON response: {content}")
+        
+        return content
+
     def chat_completion(
         self,
         message: str,
@@ -247,7 +291,14 @@ class AOAIClient(AzureOpenAI):
 
             response_message = response.choices[0].message
             self.logger.info(f"Model response: {response_message}")
-            return response_message.content
+            
+            content = response_message.content
+            
+            # JSON 형태 검증 및 수정 (response_format이 json_object인 경우)
+            if response_format and response_format.get("type") == "json_object":
+                content = self._fix_json_response(content)
+            
+            return content
         except Exception as e:
             # Log minimal context to help debug upstream callers
             snippet = message[:400] if isinstance(message, str) else str(message)[:400]

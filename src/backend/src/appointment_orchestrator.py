@@ -71,18 +71,27 @@ class AppointmentOrchestrator:
         extraction_result = self._extract_booking_info_with_llm(message)
         print(f"[DEBUG] LLM extraction result: {extraction_result}")
         
-        # 추출된 정보 업데이트
+        # 정규식 기반 추출 (주요 추출 방법)
+        regex_extracted = self._extract_booking_info(message)
+        print(f"[DEBUG] Regex extraction result: {regex_extracted}")
+        
+        # 추출된 정보 업데이트 (정규식 우선, LLM 보조)
         update_data: dict = {}
+        
+        # 1. 정규식으로 추출한 정보를 먼저 사용
+        for k, v in regex_extracted.items():
+            if v:
+                update_data[k] = v
+                print(f"[DEBUG] Using regex extracted {k}: {v}")
+        
+        # 2. LLM 추출 결과로 보강 (정규식에서 누락된 것만)
         if extraction_result and extraction_result.get("extracted"):
             for k, v in extraction_result["extracted"].items():
-                if v is not None:
+                if v is not None and k not in update_data:
                     update_data[k] = v
+                    print(f"[DEBUG] Using LLM extracted {k}: {v}")
         
-        # 보조: 정규식 기반 보강 추출 (LLM 누락값 보완)
-        regex_extracted = self._extract_booking_info(message)
-        for k, v in regex_extracted.items():
-            if v and k not in update_data:
-                update_data[k] = v
+        print(f"[DEBUG] Final update_data: {update_data}")
         
         if update_data:
             self.appointment_service.update_booking_info(chat_id, **update_data)
@@ -130,8 +139,12 @@ class AppointmentOrchestrator:
     def _extract_booking_info_with_llm(self, message: str) -> dict:
         """LLM을 사용한 예약 정보 추출"""
         try:
+            print(f"[DEBUG] Starting LLM extraction for message: {message}")
+            
             # LLM에 정보 추출 요청
             prompt = self.booking_extraction_prompt.format(query=message)
+            print(f"[DEBUG] Using prompt: {prompt[:200]}...")
+            
             raw_response = self.aoai_client.chat_completion(
                 prompt,
                 use_rag=False,
@@ -139,53 +152,46 @@ class AppointmentOrchestrator:
                 response_format={"type": "json_object"}
             )
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
-            print(f"[DEBUG] Raw response length: {len(raw_response)}")
+            print(f"[DEBUG] Raw response length: {len(raw_response) if raw_response else 0}")
             print(f"[DEBUG] Raw response type: {type(raw_response)}")
             
-            # JSON 파싱 전에 응답 정리
-            response_clean = raw_response.strip()
-            print(f"[DEBUG] Raw response before cleaning: {repr(response_clean)}")
-            
-            # JSON 부분만 추출 (```json ... ``` 형태일 수 있음)
-            if "```json" in response_clean:
-                print("[DEBUG] Found ```json markers, extracting JSON part")
-                json_start = response_clean.find("```json") + 7
-                json_end = response_clean.find("```", json_start)
-                if json_end != -1:
-                    response_clean = response_clean[json_start:json_end].strip()
-                    print(f"[DEBUG] Extracted from ```json: {repr(response_clean)}")
-            elif "```" in response_clean:
-                print("[DEBUG] Found ``` markers, extracting JSON part")
-                json_start = response_clean.find("```") + 3
-                json_end = response_clean.find("```", json_start)
-                if json_end != -1:
-                    response_clean = response_clean[json_start:json_end].strip()
-                    print(f"[DEBUG] Extracted from ```: {repr(response_clean)}")
-            else:
-                print("[DEBUG] No markdown markers found, using raw response")
-            
-            # JSON이 완전하지 않은 경우 기본값 반환
-            if not response_clean.startswith('{') or not response_clean.endswith('}'):
-                print(f"[WARNING] Incomplete JSON response:")
-                print(f"[WARNING] - Starts with '{{': {response_clean.startswith('{')}")
-                print(f"[WARNING] - Ends with '}}': {response_clean.endswith('}')}")
-                print(f"[WARNING] - Response: {repr(response_clean)}")
+            if not raw_response:
+                print("[ERROR] LLM returned empty response")
                 return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
             
-            print(f"[DEBUG] Cleaned response: {repr(response_clean)}")
-            print(f"[DEBUG] JSON validation: {json.loads(response_clean) is not None}")
+            # JSON 파싱 (aoai_client에서 이미 수정됨)
+            response_clean = raw_response.strip()
+            print(f"[DEBUG] Raw response: {repr(response_clean)}")
             
             # JSON 파싱
-            extraction_result = json.loads(response_clean)
-            print(f"[DEBUG] Successfully parsed JSON: {extraction_result}")
-            return extraction_result
+            try:
+                extraction_result = json.loads(response_clean)
+                print(f"[DEBUG] Successfully parsed JSON: {extraction_result}")
+                
+                # 결과 검증
+                if not isinstance(extraction_result, dict):
+                    print(f"[ERROR] Parsed result is not a dict: {type(extraction_result)}")
+                    return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
+                
+                # 필수 키 확인
+                required_keys = ["extracted", "missing", "confirmation_intent"]
+                for key in required_keys:
+                    if key not in extraction_result:
+                        print(f"[ERROR] Missing required key '{key}' in result")
+                        return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
+                
+                return extraction_result
+                
+            except json.JSONDecodeError as json_err:
+                print(f"[ERROR] JSON parsing failed: {json_err}")
+                print(f"[ERROR] Failed to parse: {repr(response_clean)}")
+                return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
             
-        except (json.JSONDecodeError, TypeError) as e:
-            print(f"[ERROR] Failed to parse LLM extraction result: {e}")
-            print(f"[ERROR] Raw response that failed: {repr(raw_response)}")
-            return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
         except Exception as e:
-            print(f"[ERROR] LLM extraction failed: {e}")
+            print(f"[ERROR] LLM extraction failed with exception: {e}")
+            print(f"[ERROR] Exception type: {type(e)}")
+            import traceback
+            print(f"[ERROR] Traceback: {traceback.format_exc()}")
             return {"extracted": {}, "missing": ["patient_name", "phone_number", "preferred_date", "preferred_time"], "confirmation_intent": False}
     
     def _extract_booking_info(self, message: str) -> dict:
@@ -201,6 +207,8 @@ class AppointmentOrchestrator:
             r"성함은\s*([가-힣]{2,4})",
             r"이름은\s*([가-힣]{2,4})",
             r"^\s*([가-힣]{2,4})\s*,",  # '박영재, 010-...' 형태
+            r"^\s*([가-힣]{2,4})\s+",   # '박영재 010-...' 형태 (공백으로 구분)
+            r"([가-힣]{2,4})\s+010",    # '박영재 010-...' 형태 (전화번호 앞)
         ]
         
         for pattern in name_patterns:
@@ -235,7 +243,8 @@ class AppointmentOrchestrator:
         date_patterns = [
             r"내일",
             r"모레",
-            r"(\d{1,2}\s*월\s*\d{1,2}\s*일)",
+            r"(\d{1,2}월\d{1,2}일)",     # 10월27일 (공백 없이)
+            r"(\d{1,2}\s*월\s*\d{1,2}\s*일)",  # 10월 27일 (공백 있이)
             r"(\d{1,2}\s*일)",
             r"오늘"
         ]
@@ -263,8 +272,9 @@ class AppointmentOrchestrator:
         time_patterns = [
             r"(오전\s*\d{1,2}\s*시)",
             r"(오후\s*\d{1,2}\s*시)",
-            r"(\d{1,2}\s*시)",
-            r"(\d{1,2}:\d{2})",
+            r"(\d{1,2}시)",  # 13시 (공백 없이)
+            r"(\d{1,2}\s*시)",  # 13 시 (공백 있이)
+            r"(\d{1,2}:\d{2})",  # HH:MM 형식
             r"((?:오전|오후)?\s*(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*시)",
             r"오전",
             r"오후",
@@ -314,6 +324,9 @@ class AppointmentOrchestrator:
                                 extracted["preferred_time"] = f"{hour:02d}:00"
                             else:
                                 extracted["preferred_time"] = time_str
+                    elif ":" in time_str:
+                        # HH:MM 형식
+                        extracted["preferred_time"] = time_str
                     else:
                         extracted["preferred_time"] = time_str
                 break
