@@ -64,6 +64,7 @@ class BookingInfo(BaseModel):
 
 class AppointmentRequest(BaseModel):
     """예약 완료 시 생성되는 모델"""
+    appointment_id: Optional[str] = Field(None, description="예약번호")
     patient_name: str = Field(..., description="환자 성명")
     phone_number: str = Field(..., description="연락처")
     preferred_date: str = Field(..., description="희망 날짜")
