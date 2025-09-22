@@ -175,7 +175,9 @@ class AOAIClient(AzureOpenAI):
         message: str,
         language: str = None,
         id: str = None,
-        history: list = None
+        history: list = None,
+        use_rag: bool | None = None,
+        function_calling: bool | None = None
     ) -> str:
         """
         AOAI chat completion with conversation history.
@@ -195,7 +197,8 @@ class AOAIClient(AzureOpenAI):
                 messages.append({"role": role, "content": msg.content})
         
         # Add current user message:
-        if self.use_rag:
+        effective_use_rag = self.use_rag if use_rag is None else use_rag
+        if effective_use_rag:
             # For RAG, split into system and user messages for better instruction following
             system_prompt, user_prompt = self.generate_rag_prompt(message)
             # Add system prompt as system message (overrides any existing system message)
@@ -210,7 +213,8 @@ class AOAIClient(AzureOpenAI):
         else:
             messages.append({"role": "user", "content": message})
 
-        if self.function_calling:
+        effective_function_calling = self.function_calling if function_calling is None else function_calling
+        if effective_function_calling:
             # For function calling, use the instance messages
             self.messages = messages
             function_results = self.call_functions(language=language, id=id)
@@ -219,11 +223,15 @@ class AOAIClient(AzureOpenAI):
                 return function_results
 
         # Call chat API with full conversation context:
-        response = self.chat.completions.create(
-            model=self.deployment,
-            messages=messages
-        )
-        response_message = response.choices[0].message
-        self.logger.info(f"Model response: {response_message}")
-
-        return response_message.content
+        try:
+            response = self.chat.completions.create(
+                model=self.deployment,
+                messages=messages
+            )
+            response_message = response.choices[0].message
+            self.logger.info(f"Model response: {response_message}")
+            return response_message.content
+        except Exception as e:
+            # Log minimal context to help debug upstream callers
+            self.logger.error(f"chat_completion failed: {e}")
+            raise

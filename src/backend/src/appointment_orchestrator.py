@@ -72,14 +72,22 @@ class AppointmentOrchestrator:
         print(f"[DEBUG] LLM extraction result: {extraction_result}")
         
         # 추출된 정보 업데이트
+        update_data: dict = {}
         if extraction_result and extraction_result.get("extracted"):
-            extracted_info = extraction_result["extracted"]
-            # None이 아닌 값만 업데이트
-            update_data = {k: v for k, v in extracted_info.items() if v is not None}
-            if update_data:
-                self.appointment_service.update_booking_info(chat_id, **update_data)
-                # 업데이트된 정보로 다시 로드
-                booking_info = self.appointment_service.get_booking_info(chat_id)
+            for k, v in extraction_result["extracted"].items():
+                if v is not None:
+                    update_data[k] = v
+        
+        # 보조: 정규식 기반 보강 추출 (LLM 누락값 보완)
+        regex_extracted = self._extract_booking_info(message)
+        for k, v in regex_extracted.items():
+            if v and k not in update_data:
+                update_data[k] = v
+        
+        if update_data:
+            self.appointment_service.update_booking_info(chat_id, **update_data)
+            # 업데이트된 정보로 다시 로드
+            booking_info = self.appointment_service.get_booking_info(chat_id)
         
         # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
         collected_info_str = booking_info.to_summary_string()
@@ -124,7 +132,7 @@ class AppointmentOrchestrator:
         try:
             # LLM에 정보 추출 요청
             prompt = self.booking_extraction_prompt.format(query=message)
-            raw_response = self.aoai_client.chat_completion(prompt)
+            raw_response = self.aoai_client.chat_completion(prompt, use_rag=False, function_calling=False)
             print(f"[DEBUG] LLM extraction raw response: {raw_response}")
             print(f"[DEBUG] Raw response length: {len(raw_response)}")
             print(f"[DEBUG] Raw response type: {type(raw_response)}")
@@ -186,7 +194,8 @@ class AppointmentOrchestrator:
             r"([가-힣]{2,4})이라고",
             r"([가-힣]{2,4})라고",
             r"성함은\s*([가-힣]{2,4})",
-            r"이름은\s*([가-힣]{2,4})"
+            r"이름은\s*([가-힣]{2,4})",
+            r"^\s*([가-힣]{2,4})\s*,",  # '박영재, 010-...' 형태
         ]
         
         for pattern in name_patterns:
@@ -215,8 +224,8 @@ class AppointmentOrchestrator:
         date_patterns = [
             r"내일",
             r"모레",
-            r"(\d{1,2}월\s*\d{1,2}일)",
-            r"(\d{1,2}일)",
+            r"(\d{1,2}\s*월\s*\d{1,2}\s*일)",
+            r"(\d{1,2}\s*일)",
             r"오늘"
         ]
         
@@ -241,7 +250,9 @@ class AppointmentOrchestrator:
         
         # 시간 추출
         time_patterns = [
-            r"(\d{1,2}시)",
+            r"(오전\s*\d{1,2}\s*시)",
+            r"(오후\s*\d{1,2}\s*시)",
+            r"(\d{1,2}\s*시)",
             r"(\d{1,2}:\d{2})",
             r"오전",
             r"오후",
@@ -254,9 +265,22 @@ class AppointmentOrchestrator:
             match = re.search(pattern, message)
             if match:
                 if "오전" in message or "아침" in message:
-                    extracted["preferred_time"] = "09:00"
+                    # 오전 N시 → 09/10 등으로 보정
+                    m = re.search(r"오전\s*(\d{1,2})\s*시", message)
+                    if m:
+                        hour = int(m.group(1))
+                        extracted["preferred_time"] = f"{hour:02d}:00"
+                    else:
+                        extracted["preferred_time"] = "09:00"
                 elif "오후" in message:
-                    extracted["preferred_time"] = "14:00"
+                    m = re.search(r"오후\s*(\d{1,2})\s*시", message)
+                    if m:
+                        hour = int(m.group(1))
+                        if hour < 12:
+                            hour += 12
+                        extracted["preferred_time"] = f"{hour:02d}:00"
+                    else:
+                        extracted["preferred_time"] = "14:00"
                 elif "점심" in message:
                     extracted["preferred_time"] = "12:00"
                 elif "저녁" in message:
@@ -264,8 +288,13 @@ class AppointmentOrchestrator:
                 else:
                     time_str = match.group(1)
                     if "시" in time_str:
-                        hour = int(time_str.replace("시", ""))
-                        extracted["preferred_time"] = f"{hour:02d}:00"
+                        # '오전/오후' 없이 '10시' 등
+                        m = re.search(r"(\d{1,2})\s*시", time_str)
+                        if m:
+                            hour = int(m.group(1))
+                            extracted["preferred_time"] = f"{hour:02d}:00"
+                        else:
+                            extracted["preferred_time"] = time_str
                     else:
                         extracted["preferred_time"] = time_str
                 break
