@@ -46,6 +46,20 @@ class BookingInfo(BaseModel):
         if not summary:
             return "  - 아직 수집된 정보가 없습니다."
         return "\n".join(summary)
+    
+    def to_appointment_request(self) -> 'AppointmentRequest':
+        """BookingInfo를 AppointmentRequest로 변환"""
+        if not self.is_complete():
+            raise ValueError("Incomplete booking information")
+        
+        return AppointmentRequest(
+            patient_name=self.patient_name,
+            phone_number=self.phone_number,
+            preferred_date=self.preferred_date,
+            preferred_time=self.preferred_time,
+            department=self.department,
+            consultation_summary=self.consultation_summary or ""
+        )
 
 
 class AppointmentRequest(BaseModel):

@@ -27,6 +27,9 @@ Set confirmation_intent to true if user expresses booking confirmation like:
 - "네", "맞습니다", "좋아요" (when in booking context)
 - "예약하겠습니다", "예약하세요"
 
+IMPORTANT: When user says "네", "좋아요", "맞습니다" etc. in response to a booking confirmation request, 
+DO NOT extract new information. Instead, set confirmation_intent to true and keep all extracted fields as null.
+
 ## Examples
 
 User: "홍길동입니다. 010-1234-5678이고 내일 오후 3시에 예약할게요"
@@ -43,6 +46,12 @@ Assistant: {{"extracted": {{"patient_name": null, "phone_number": null, "preferr
 
 User: "박영재 01054226448 10월27일 13시"
 Assistant: {{"extracted": {{"patient_name": "박영재", "phone_number": "010-5422-6448", "preferred_date": "10월27일", "preferred_time": "13시"}}, "missing": [], "confirmation_intent": false}}
+
+User: "네"
+Assistant: {{"extracted": {{"patient_name": null, "phone_number": null, "preferred_date": null, "preferred_time": null}}, "missing": [], "confirmation_intent": true}}
+
+User: "좋아요"
+Assistant: {{"extracted": {{"patient_name": null, "phone_number": null, "preferred_date": null, "preferred_time": null}}, "missing": [], "confirmation_intent": true}}
 
 ---
 

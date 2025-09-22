@@ -97,6 +97,8 @@ class AppointmentOrchestrator:
             self.appointment_service.update_booking_info(chat_id, **update_data)
             # 업데이트된 정보로 다시 로드
             booking_info = self.appointment_service.get_booking_info(chat_id)
+            print(f"[DEBUG] Updated booking_info: {booking_info}")
+            print(f"[DEBUG] booking_info.is_complete(): {booking_info.is_complete()}")
         
         # 프롬프트에 전달할 현재까지 수집된 정보 문자열 생성
         collected_info_str = booking_info.to_summary_string()
@@ -112,6 +114,9 @@ class AppointmentOrchestrator:
         if not booking_info.preferred_time:
             missing_labels.append("희망 시간")
         missing_fields_str = ", ".join(missing_labels) if missing_labels else "없음"
+        
+        print(f"[DEBUG] Missing fields: {missing_labels}")
+        print(f"[DEBUG] Missing fields string: {missing_fields_str}")
 
         # 예약 프롬프트로 응답 생성
         prompt = self.booking_prompt.format(
